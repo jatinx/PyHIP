@@ -2,7 +2,7 @@
 Python interface to hiprtc
 """
 
-import sys, warnings, ctypes
+import sys, ctypes
 
 _libhiprtc_libname = 'libhiprtc.so'
 
@@ -32,9 +32,32 @@ def POINTER(obj):
 
     return p
 
+_libhiprtc.hiprtcGetErrorString.restype = ctypes.c_char_p
+_libhiprtc.hiprtcGetErrorString.argtypes = [ctypes.c_int]
+def hiprtcGetErrorString(e):
+    """
+    Retrieve hiprtc error string.
+
+    Return the string associated with the specified hiprtc error status
+    code.
+
+    Parameters
+    ----------
+    e : int
+        Error number.
+
+    Returns
+    -------
+    s : str
+        Error string.
+
+    """
+
+    return _libhiprtc.hiprtcGetErrorString(e)
+
 # Generic hiprtc Error
 class hiprtcError(Exception):
-    """CUDA error."""
+    """hiprtc error."""
     pass
 
 class hiprtcErrorOutOfMemory(hiprtcError):
