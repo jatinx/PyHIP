@@ -122,8 +122,10 @@ def hiprtcCreateProgram(source, name, header_names, header_sources):
         Source in python string
     name : string
         Program name 
-    headers_:
-        map of headernames and headersource
+    header_names: list of string
+        list of headernames
+    header_sources: list of string
+        list of headernames
     
     Returns
     -------
@@ -134,8 +136,8 @@ def hiprtcCreateProgram(source, name, header_names, header_sources):
     # Encode strings to utf-8
     e_source = source.encode('utf-8')
     e_name = name.encode('utf-8')
-    e_header_names = None
-    e_header_sources = None
+    e_header_names = list()
+    e_header_sources = list()
     for header_name in header_names:
         e_header_name = header_name.encode('utf-8')
         e_header_names.append(e_header_name)
@@ -206,7 +208,7 @@ def hiprtcCompileProgram(prog, options):
         e_options.append(option.encode('utf-8'))
     c_options = (ctypes.c_char_p * len(e_options))()
     c_options[:] = e_options
-    status = _libhiprtc.hiprtcAddNameExpression(prog, len(c_options), c_options)
+    status = _libhiprtc.hiprtcCompileProgram(prog, len(c_options), c_options)
     hiprtcCheckStatus(status)
 
 _libhiprtc.hiprtcGetProgramLogSize.restype = int
