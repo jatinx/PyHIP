@@ -665,7 +665,7 @@ def hipModuleGetFunction(module, func_name):
         pointer to created module
     func_name : string
         name of function to be retrived from module
-    
+
     Returns
     -------
     kernel : ctypes ptr
@@ -737,14 +737,18 @@ def hipModuleLaunchKernel(kernel, bx, by, bz, tx, ty, tz, shared, stream, struct
     c_ty = ctypes.c_uint(ty)
     c_tz = ctypes.c_uint(tz)
     c_shared = ctypes.c_uint(shared)
-    
+
     ctypes.sizeof(struct)
     hip_launch_param_buffer_ptr = ctypes.c_void_p(1)
     hip_launch_param_buffer_size = ctypes.c_void_p(2)
     hip_launch_param_buffer_end = ctypes.c_void_p(3)
-    config = (ctypes.c_void_p * 5)(hip_launch_param_buffer_ptr, ctypes.byref(struct), hip_launch_param_buffer_size. ctypes.sizeof(struct), hip_launch_param_buffer_end)
+    size = ctypes.c_size_t(ctypes.sizeof(struct))
+    p_size = ctypes.c_void_p(ctypes.addressof(size))
+    p_struct = ctypes.c_void_p(ctypes.addressof(struct))
+    config = (ctypes.c_void_p * 5)(hip_launch_param_buffer_ptr, p_struct, hip_launch_param_buffer_size, p_size, hip_launch_param_buffer_end)
+    nullptr = ctypes.POINTER(ctypes.c_void_p)(ctypes.c_void_p(0))
 
-    status = _libhip.hipModuleLaunchKernel(kernel, c_bx, c_by, c_bz, c_tx, c_ty, c_tz, c_shared, stream, ctypes.c_void_p(), config)
+    status = _libhip.hipModuleLaunchKernel(kernel, c_bx, c_by, c_bz, c_tx, c_ty, c_tz, c_shared, stream, None, config)
     hipCheckStatus(status)
 
 _libhip.hipDeviceSynchronize.restype = int
