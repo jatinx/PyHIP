@@ -8,7 +8,7 @@ There are two parts of it, hip library and hiprtc library.
 ## Example Usage
 ```python
 import ctypes
-from hip import hip, hiprtc
+from pyhip import hip, hiprtc
 prog = hiprtc.hiprtcCreateProgram('extern "C" __global__ void set(int *a) { *a = 10; }', 'set', [], [])
 hiprtc.hiprtcCompileProgram(prog, ['--offload-arch=gfx906'])
 code = hiprtc.hiprtcGetCode(prog)
