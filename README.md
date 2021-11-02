@@ -9,7 +9,12 @@ There are two parts of it, hip library and hiprtc library.
 ```python
 import ctypes
 from pyhip import hip, hiprtc
-prog = hiprtc.hiprtcCreateProgram('extern "C" __global__ void set(int *a) { *a = 10; }', 'set', [], [])
+source = """
+extern "C" __global__ void set(int *a) {
+  *a = 10;
+}
+"""
+prog = hiprtc.hiprtcCreateProgram(source, 'set', [], [])
 hiprtc.hiprtcCompileProgram(prog, ['--offload-arch=gfx906'])
 code = hiprtc.hiprtcGetCode(prog)
 module = hip.hipModuleLoadData(code)
