@@ -24,7 +24,7 @@ def cpu_axpy(a):
         j = j + 1
     return result
 
-from hip import hip, hiprtc
+from pyhip import hip, hiprtc
 import ctypes
 def gpu_axpy(res):
     source = """
