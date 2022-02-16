@@ -5,6 +5,8 @@ This small python lib which hooks into HIP library and provides pythonic interfa
 
 There are two parts of it, hip library and hiprtc library.
 
+Note: At the moment hiprtc is not a separate library.
+
 ## Example Usage
 ```python
 import ctypes

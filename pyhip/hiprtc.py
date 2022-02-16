@@ -4,7 +4,8 @@ Python interface to hiprtc
 
 import sys, ctypes
 
-_libhiprtc_libname = 'libhiprtc.so'
+# _libhiprtc_libname = 'libhiprtc.so' # Currently its the same library
+_libhiprtc_libname = 'libamdhip64.so'
 
 _libhiprtc = None
 if 'linux' in sys.platform:
