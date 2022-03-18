@@ -212,6 +212,31 @@ def hiprtcAddNameExpression(prog, expression):
     hiprtcCheckStatus(status)
 
 
+_libhiprtc.hiprtcCompileProgram.restype = int
+_libhiprtc.hiprtcCompileProgram.argtypes = [ctypes.c_void_p,                 # hiprtcProgram
+                                            ctypes.c_int,                    # num of options
+                                            ctypes.POINTER(ctypes.c_char_p)] # options
+def hiprtcCompileProgram(prog, options):
+    """
+    Compiles the hiprtc program
+
+    Parameters
+    ----------
+    prog : ctypes pointer
+        hiprtc program handle
+    options : list of string
+        option list to be passed to compilation
+    """
+
+    e_options = list()
+    for option in options:
+        e_options.append(option.encode('utf-8'))
+    c_options = (ctypes.c_char_p * len(e_options))()
+    c_options[:] = e_options
+    status = _libhiprtc.hiprtcCompileProgram(prog, len(c_options), c_options)
+    hiprtcCheckStatus(status)
+
+
 _libhiprtc.hiprtcGetProgramLogSize.restype = int
 _libhiprtc.hiprtcGetProgramLogSize.argtypes = [ctypes.c_void_p,                 # hiprtcProgram
                                                ctypes.POINTER(ctypes.c_size_t)] # Size of log
@@ -241,31 +266,6 @@ def hiprtcGetProgramLog(prog):
     status = _libhiprtc.hiprtcGetProgramLog(prog, e_log)
     hiprtcCheckStatus(status)
     return e_log.decode('utf-8')
-
-
-_libhiprtc.hiprtcCompileProgram.restype = int
-_libhiprtc.hiprtcCompileProgram.argtypes = [ctypes.c_void_p,                 # hiprtcProgram
-                                            ctypes.c_int,                    # num of options
-                                            ctypes.POINTER(ctypes.c_char_p)] # options
-def hiprtcCompileProgram(prog, options):
-    """
-    Compiles the hiprtc program
-
-    Parameters
-    ----------
-    prog : ctypes pointer
-        hiprtc program handle
-    options : list of string
-        option list to be passed to compilation
-    """
-
-    e_options = list()
-    for option in options:
-        e_options.append(option.encode('utf-8'))
-    c_options = (ctypes.c_char_p * len(e_options))()
-    c_options[:] = e_options
-    status = _libhiprtc.hiprtcCompileProgram(prog, len(c_options), c_options)
-    hiprtcCheckStatus(status)
 
 
 _libhiprtc.hiprtcGetCodeSize.restype = int
