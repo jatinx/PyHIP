@@ -586,9 +586,282 @@ def hipGetDevice():
     hipCheckStatus(status)
     return dev.value
 
+
+class hipDeviceArch(ctypes.Structure):
+    _fields_ = [
+        # *32-bit Atomics*
+        # 32-bit integer atomics for global memory.
+        ('hasGlobalInt32Atomics', ctypes.c_uint, 1),
+
+        # 32-bit float atomic exch for global memory.
+        ('hasGlobalFloatAtomicExch', ctypes.c_uint, 1),
+
+        # 32-bit integer atomics for shared memory.
+        ('hasSharedInt32Atomics', ctypes.c_uint, 1),
+
+        # 32-bit float atomic exch for shared memory.
+        ('hasSharedFloatAtomicExch', ctypes.c_uint, 1),
+
+        # 32-bit float atomic add in global and shared memory.
+        ('hasFloatAtomicAdd', ctypes.c_uint, 1),
+
+        # *64-bit Atomics*
+        # 64-bit integer atomics for global memory.
+        ('hasGlobalInt64Atomics', ctypes.c_uint, 1),
+
+        # 64-bit integer atomics for shared memory.
+        ('hasSharedInt64Atomics', ctypes.c_uint, 1),
+
+        # *Doubles*
+        # Double-precision floating point.
+        ('hasDoubles', ctypes.c_uint, 1),
+
+        # *Warp cross-lane operations*
+        # Warp vote instructions (__any, __all).
+        ('hasWarpVote', ctypes.c_uint, 1),
+
+        # Warp ballot instructions (__ballot).
+        ('hasWarpBallot', ctypes.c_uint, 1),
+
+        # Warp shuffle operations. (__shfl_*).
+        ('hasWarpShuffle', ctypes.c_uint, 1),
+
+        # Funnel two words into one with shift&mask caps.
+        ('hasFunnelShift', ctypes.c_uint, 1),
+
+        # *Sync*
+        # __threadfence_system.
+        ('hasThreadFenceSystem', ctypes.c_uint, 1),
+
+        # __syncthreads_count, syncthreads_and, syncthreads_or.
+        ('hasSyncThreadsExt', ctypes.c_uint, 1),
+
+        # *Misc*
+        # Surface functions.
+        ('hasSurfaceFuncs', ctypes.c_uint, 1),
+
+        # Grid and group dims are 3D (rather than 2D).
+        ('has3dGrid', ctypes.c_uint, 1),
+
+        # Dynamic parallelism.
+        ('hasDynamicParallelism', ctypes.c_uint, 1),
+    ]
+
+
+class hipDeviceProperties(ctypes.Structure):
+    _fields_ = [
+        # Device name
+        ('_name', ctypes.c_char * 256),
+
+        # Size of global memory region (in bytes)
+        ('totalGlobalMem', ctypes.c_size_t),
+
+        # Size of shared memory region (in bytes).
+        ('sharedMemPerBlock', ctypes.c_size_t),
+
+        # Registers per block.
+        ('regsPerBlock', ctypes.c_int),
+
+        # Warp size.
+        ('warpSize', ctypes.c_int),
+
+        # Max work items per work group or workgroup max size.
+        ('maxThreadsPerBlock', ctypes.c_int),
+
+        # Max number of threads in each dimension (XYZ) of a block.
+        ('maxThreadsDim', ctypes.c_int * 3),
+
+        # Max grid dimensions (XYZ).
+        ('maxGridSize', ctypes.c_int * 3),
+
+        # Max clock frequency of the multiProcessors in khz.
+        ('clockRate', ctypes.c_int),
+
+        # Max global memory clock frequency in khz.
+        ('memoryClockRate', ctypes.c_int),
+
+        # Global memory bus width in bits.
+        ('memoryBusWidth', ctypes.c_int),
+
+        # Size of shared memory region (in bytes).
+        ('totalConstMem', ctypes.c_size_t),
+
+        # Major compute capability.  On HCC, this is an approximation and features may
+        # differ from CUDA CC.  See the arch feature flags for portable ways to query
+        # feature caps.
+        ('major', ctypes.c_int),
+
+        # Minor compute capability.  On HCC, this is an approximation and features may
+        # differ from CUDA CC.  See the arch feature flags for portable ways to query
+        # feature caps.
+        ('minor', ctypes.c_int),
+
+        # Number of multi-processors (compute units).
+        ('multiProcessorCount', ctypes.c_int),
+
+        # L2 cache size.
+        ('l2CacheSize', ctypes.c_int),
+
+        # Maximum resident threads per multi-processor.
+        ('maxThreadsPerMultiProcessor', ctypes.c_int),
+
+        # Compute mode.
+        ('computeMode', ctypes.c_int),
+
+        # Frequency in khz of the timer used by the device-side "clock*"
+        # instructions.  New for HIP.
+        ('clockInstructionRate', ctypes.c_int),
+
+        # Architectural feature flags.  New for HIP.
+        ('arch', hipDeviceArch),
+
+        # Device can possibly execute multiple kernels concurrently.
+        ('concurrentKernels', ctypes.c_int),
+
+        # PCI Domain ID
+        ('pciDomainID', ctypes.c_int),
+
+        # PCI Bus ID.
+        ('pciBusID', ctypes.c_int),
+
+        # PCI Device ID.
+        ('pciDeviceID', ctypes.c_int),
+
+        # Maximum Shared Memory Per Multiprocessor.
+        ('maxSharedMemoryPerMultiProcessor', ctypes.c_size_t),
+
+        # 1 if device is on a multi-GPU board, 0 if not.
+        ('isMultiGpuBoard', ctypes.c_int),
+
+        # Check whether HIP can map host memory
+        ('canMapHostMemory', ctypes.c_int),
+
+        # DEPRECATED: use gcnArchName instead
+        ('gcnArch', ctypes.c_int),
+
+        # AMD GCN Arch Name.
+        ('_gcnArchName', ctypes.c_char * 256),
+
+        # APU vs dGPU
+        ('integrated', ctypes.c_int),
+
+        # HIP device supports cooperative launch
+        ('cooperativeLaunch', ctypes.c_int),
+
+        # HIP device supports cooperative launch on multiple devices
+        ('cooperativeMultiDeviceLaunch', ctypes.c_int),
+
+        # Maximum size for 1D textures bound to linear memory
+        ('maxTexture1DLinear', ctypes.c_int),
+
+        # Maximum number of elements in 1D images
+        ('maxTexture1D', ctypes.c_int),
+
+        # Maximum dimensions (width, height) of 2D images, in image elements
+        ('maxTexture2D', ctypes.c_int * 2),
+
+        # Maximum dimensions (width, height, depth) of 3D images, in image elements
+        ('maxTexture3D', ctypes.c_int * 3),
+
+        # Addres of HDP_MEM_COHERENCY_FLUSH_CNTL register
+        ('hdpMemFlushCntl', POINTER(ctypes.c_uint)),
+
+        # Addres of HDP_REG_COHERENCY_FLUSH_CNTL register
+        ('hdpRegFlushCntl', POINTER(ctypes.c_uint)),
+
+        # Maximum pitch in bytes allowed by memory copies
+        ('memPitch', ctypes.c_size_t),
+
+        # Alignment requirement for textures
+        ('textureAlignment', ctypes.c_size_t),
+
+        # Pitch alignment requirement for texture references bound to pitched memory
+        ('texturePitchAlignment', ctypes.c_size_t),
+
+        # Run time limit for kernels executed on the device
+        ('kernelExecTimeoutEnabled', ctypes.c_int),
+
+        # Device has ECC support enabled
+        ('ECCEnabled', ctypes.c_int),
+
+        # 1:If device is Tesla device using TCC driver, else 0
+        ('tccDriver', ctypes.c_int),
+
+        # HIP device supports cooperative launch on multiple
+        # devices with unmatched functions
+        ('cooperativeMultiDeviceUnmatchedFunc', ctypes.c_int),
+
+        # HIP device supports cooperative launch on multiple
+        # devices with unmatched grid dimensions
+        ('cooperativeMultiDeviceUnmatchedGridDim', ctypes.c_int),
+
+        # HIP device supports cooperative launch on multiple
+        # devices with unmatched block dimensions
+        ('cooperativeMultiDeviceUnmatchedBlockDim', ctypes.c_int),
+
+        # HIP device supports cooperative launch on multiple
+        # devices with unmatched shared memories
+        ('cooperativeMultiDeviceUnmatchedSharedMem', ctypes.c_int),
+
+        # 1: if it is a large PCI bar device, else 0
+        ('isLargeBar', ctypes.c_int),
+
+        # Revision of the GPU in this device
+        ('asicRevision', ctypes.c_int),
+
+        # Device supports allocating managed memory on this system
+        ('managedMemory', ctypes.c_int),
+
+        # Host can directly access managed memory on the device without migration
+        ('directManagedMemAccessFromHost', ctypes.c_int),
+
+        # Device can coherently access managed memory concurrently with the CPU
+        ('concurrentManagedAccess', ctypes.c_int),
+
+        # Device supports coherently accessing pageable memory
+        # without calling hipHostRegister on it
+        ('pageableMemoryAccess', ctypes.c_int),
+
+        # Device accesses pageable memory via the host's page tables
+        ('pageableMemoryAccessUsesHostPageTables', ctypes.c_int),
+    ]
+
+    @property
+    def name(self):
+        return self._name.decode('utf-8')
+
+    @property
+    def gcnArchName(self):
+        return self._gcnArchName.decode('utf-8')
+
+
+_libhip.hipGetDeviceProperties.restype = int
+_libhip.hipGetDeviceProperties.argtypes = [POINTER(hipDeviceProperties), ctypes.c_int]
+def hipGetDeviceProperties(deviceId: int):
+    """
+    Populates hipGetDeviceProperties with information for the specified device.
+    Returns device properties of the specified device.
+    Parameters
+    ----------
+    deviceId : int
+        Which device to query for information
+    Returns
+    -------
+    device_properties : hipDeviceProperties
+       Information for the specified device
+    """
+    device_properties = hipDeviceProperties()
+    status = _libhip.hipGetDeviceProperties(ctypes.pointer(device_properties),
+                                            deviceId)
+    hipCheckStatus(status)
+    return device_properties
+
+
 # Memory types:
 hipMemoryTypeHost = 1
 hipMemoryTypeDevice = 2
+hipMemoryTypeArray = 3
+hipMemoryTypeUnified = 4  # Not used currently
 
 class hipPointerAttributes(ctypes.Structure):
     _fields_ = [

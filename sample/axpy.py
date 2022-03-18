@@ -36,7 +36,9 @@ def gpu_axpy(res):
     }
     """
     prog = hiprtc.hiprtcCreateProgram(source, 'axpy', [], [])
-    hiprtc.hiprtcCompileProgram(prog, ['--offload-arch=gfx906'])
+    device_properties = hip.hipGetDeviceProperties(0)
+    print(f"Compiling kernel for {device_properties.name}")
+    hiprtc.hiprtcCompileProgram(prog, [f'--offload-arch={device_properties.gcnArchName}'])
     code = hiprtc.hiprtcGetCode(prog)
     module = hip.hipModuleLoadData(code)
     kernel = hip.hipModuleGetFunction(module, 'axpy')

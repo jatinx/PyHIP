@@ -145,18 +145,18 @@ def hiprtcCreateProgram(source, name, header_names, header_sources):
     source : string
         Source in python string
     name : string
-        Program name 
+        Program name
     header_names: list of string
         list of headernames
     header_sources: list of string
         list of headernames
-    
+
     Returns
     -------
     prog : ctypes pointer
         hiprtc program handle
     """
-    
+
     # Encode strings to utf-8
     e_source = source.encode('utf-8')
     e_name = name.encode('utf-8')
@@ -205,7 +205,7 @@ def hiprtcAddNameExpression(prog, expression):
     prog : ctypes pointer
         hiprtc program handle
     expression : string
-        exression name 
+        exression name
     """
     e_expression = expression.encode('utf-8')
     status = _libhiprtc.hiprtcAddNameExpression(prog, e_expression)
@@ -263,7 +263,7 @@ def hiprtcGetProgramLog(prog):
     e_log = log.encode('utf-8')
     status = _libhiprtc.hiprtcGetProgramLog(prog, e_log)
     hiprtcCheckStatus(status)
-    return e_log
+    return e_log.decode('utf-8')
 
 _libhiprtc.hiprtcGetCodeSize.restype = int
 _libhiprtc.hiprtcGetCodeSize.argtypes = [ctypes.c_void_p,                 # hiprtcProgram
