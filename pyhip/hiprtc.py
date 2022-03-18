@@ -265,7 +265,6 @@ def hiprtcCompileProgram(prog, options):
     c_options = (ctypes.c_char_p * len(e_options))()
     c_options[:] = e_options
     status = _libhiprtc.hiprtcCompileProgram(prog, len(c_options), c_options)
-    print(hiprtcGetProgramLog(prog))
     hiprtcCheckStatus(status)
 
 
