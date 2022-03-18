@@ -28,6 +28,7 @@ from pyhip import hip, hiprtc
 import ctypes
 def gpu_axpy(res):
     source = """
+    #include <hip/hip_runtime.h> // Needed for older ROCm versions (at least 4.2) to access blockDim / blockIdx / threadIdx
     extern "C" __global__ void axpy(int *a, int x, int y, size_t size) {
       int i = blockDim.x * blockIdx.x + threadIdx.x;
       if(i < size) {
