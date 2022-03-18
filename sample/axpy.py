@@ -28,7 +28,9 @@ from pyhip import hip, hiprtc
 import ctypes
 def gpu_axpy(res):
     source = """
-    #include <hip/hip_runtime.h> // Needed for older ROCm versions (at least 4.2) to access blockDim / blockIdx / threadIdx
+    #if (HIP_VERSION_MAJOR == 4 && HIP_VERSION_MINOR <= 2)
+    #include <hip/hip_runtime.h> // Needed for older ROCm versions (at least 4.2)
+    #endif
     extern "C" __global__ void axpy(int *a, int x, int y, size_t size) {
       int i = blockDim.x * blockIdx.x + threadIdx.x;
       if(i < size) {
@@ -38,7 +40,7 @@ def gpu_axpy(res):
     """
     prog = hiprtc.hiprtcCreateProgram(source, 'axpy', [], [])
     device_properties = hip.hipGetDeviceProperties(0)
-    print(f"Compiling kernel for {device_properties.name}")
+    print(f"Compiling kernel for {device_properties.gcnArchName}")
     hiprtc.hiprtcCompileProgram(prog, [f'--offload-arch={device_properties.gcnArchName}'])
     code = hiprtc.hiprtcGetCode(prog)
     module = hip.hipModuleLoadData(code)

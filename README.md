@@ -18,7 +18,7 @@ extern "C" __global__ void set(int *a) {
 """
 prog = hiprtc.hiprtcCreateProgram(source, 'set', [], [])
 device_properties = hip.hipGetDeviceProperties(0)
-print(f"Compiling kernel for {device_properties.name}")
+print(f"Compiling kernel for {device_properties.gcnArchName}")
 hiprtc.hiprtcCompileProgram(prog, [f'--offload-arch={device_properties.gcnArchName}'])
 code = hiprtc.hiprtcGetCode(prog)
 module = hip.hipModuleLoadData(code)
