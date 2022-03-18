@@ -205,7 +205,7 @@ def hiprtcAddNameExpression(prog, expression):
     prog : ctypes pointer
         hiprtc program handle
     expression : string
-        exression name
+        expression name
     """
     e_expression = expression.encode('utf-8')
     status = _libhiprtc.hiprtcAddNameExpression(prog, e_expression)

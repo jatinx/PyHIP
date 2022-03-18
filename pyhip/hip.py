@@ -927,7 +927,7 @@ def hipModuleLoadData(data):
 _libhip.hipModuleGetFunction.restype = int
 _libhip.hipModuleGetFunction.argtypes = [ctypes.POINTER(ctypes.c_void_p), # Kernel
                                       ctypes.c_void_p,                    # Module
-                                      ctypes.POINTER(ctypes.c_char)]      # kenrel name
+                                      ctypes.POINTER(ctypes.c_char)]      # kernel name
 def hipModuleGetFunction(module, func_name):
     """
     gets the kernel from module
