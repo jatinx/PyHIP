@@ -759,3 +759,21 @@ def hipDeviceSynchronize():
     """
     status = _libhip.hipDeviceSynchronize()
     hipCheckStatus(status)
+
+
+_libhip.hipInit.restype = int
+_libhip.hipInit.argtypes = [ctypes.c_uint]  # flags
+def hipInit(flags):
+    """
+    Explicitly initializes the HIP runtime.
+
+    Most HIP APIs implicitly initialize the HIP runtime.
+    This API provides control over the timing of the initialization.
+
+    Parameters
+    ----------
+    flags : int
+    """
+    c_flags = ctypes.c_uint(flags)
+    status = _libhip.hipInit(c_flags)
+    hipCheckStatus(status)
