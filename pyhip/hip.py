@@ -2,7 +2,8 @@
 Python interface to hip library
 """
 
-import sys, ctypes
+import ctypes
+import sys
 
 _libhip_libname = 'libamdhip64.so'
 
@@ -13,7 +14,7 @@ else:
     # Currently we do not support windows, mainly because I do not have a windows build of hip
     raise RuntimeError('Only linux is supported')
 
-if _libhip == None:
+if _libhip is None:
     raise OSError('hiprtc library not found')
 
 def POINTER(obj):
@@ -383,6 +384,231 @@ def hipCheckStatus(status):
         else:
             raise e
 
+# Stream management
+
+_libhip.hipStreamCreate.restype = int
+_libhip.hipStreamCreate.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+def hipStreamCreate():
+    """
+    Create an asynchronous stream.
+
+    Create a new asynchronous stream.  @p stream returns an opaque handle that can be used to
+    reference the newly created stream in subsequent hipStream* commands.  The stream is allocated on
+    the heap and will remain allocated even if the handle goes out-of-scope.  To release the memory
+    used by the stream, application must call hipStreamDestroy.
+
+    Returns
+    -------
+    ptr : ctypes pointer
+        Valid pointer to stream object.
+    """
+    ptr = ctypes.c_void_p()
+    status = _libhip.hipStreamCreate(ctypes.byref(ptr))
+    hipCheckStatus(status)
+    return ptr
+
+_libhip.hipStreamDestroy.restype = int
+_libhip.hipStreamDestroy.argtypes = [ctypes.c_void_p]
+def hipStreamDestroy(ptr):
+    """
+    Destroys the specified stream.
+
+    If commands are still executing on the specified stream, some may complete execution before the
+    queue is deleted.
+
+    The queue may be destroyed while some commands are still inflight, or may wait for all commands
+    queued to the stream before destroying it.
+
+    Parameters
+    -------
+    ptr : ctypes pointer
+        Valid pointer to stream object.
+    """
+    status = _libhip.hipStreamDestroy(ptr)
+    hipCheckStatus(status)
+
+_libhip.hipStreamDestroy.restype = int
+_libhip.hipStreamDestroy.argtypes = [ctypes.c_void_p]
+def hipStreamDestroy(ptr):
+    """
+    Destroys the specified stream.
+
+    If commands are still executing on the specified stream, some may complete execution before the
+    queue is deleted.
+
+    The queue may be destroyed while some commands are still inflight, or may wait for all commands
+    queued to the stream before destroying it.
+
+    Parameters
+    -------
+    ptr : ctypes pointer
+        Valid pointer to stream object.
+    """
+    status = _libhip.hipStreamDestroy(ptr)
+    hipCheckStatus(status)
+
+_libhip.hipStreamSynchronize.restype = int
+_libhip.hipStreamSynchronize.argtypes = [ctypes.c_void_p]
+def hipStreamSynchronize(ptr):
+    """
+    Wait for all commands in stream to complete.
+
+    This command is host-synchronous : the host will block until the specified stream is empty.
+
+    This command follows standard null-stream semantics.  Specifically, specifying the null stream
+    will cause the command to wait for other streams on the same device to complete all pending
+    operations.
+
+    This command honors the hipDeviceLaunchBlocking flag, which controls whether the wait is active
+    or blocking.
+
+    Parameters
+    -------
+    ptr : ctypes pointer
+        Valid pointer to stream object.
+    """
+    status = _libhip.hipStreamSynchronize(ptr)
+    hipCheckStatus(status)
+
+# Event management
+
+# Event creation flags
+hipEventDefault = 0
+hipEventBlockingSync = 1
+hipEventDisableTiming = 2
+hipEventInterprocess = 4
+
+_libhip.hipEventCreateWithFlags.restype = int
+_libhip.hipEventCreateWithFlags.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_int]
+def hipEventCreateWithFlags(flags):
+    """
+    Create an event with the specified flags
+
+    Parameters
+    ----------
+    flags : int
+        Flags to control event behavior.  Valid values are hipEventDefault,
+        hipEventBlockingSync, hipEventDisableTiming, #hipEventInterprocess
+        * hipEventDefault : Default flag.  The event will use active synchronization and will support
+        timing.  Blocking synchronization provides lowest possible latency at the expense of dedicating a
+        CPU to poll on the event.
+        * hipEventBlockingSync : The event will use blocking synchronization : if hipEventSynchronize is
+        called on this event, the thread will block until the event completes.  This can increase latency
+        for the synchroniation but can result in lower power and more resources for other CPU threads.
+        * hipEventDisableTiming : Disable recording of timing information. Events created with this flag
+        would not record profiling data and provide best performance if used for synchronization.
+        * hipEventInterprocess : Warning On AMD platform, support is under development.  Use of this flag
+        will return an error.
+
+    Returns
+    -------
+    ptr : ctypes pointer
+        Pointer to the newly created event.
+
+    """
+    ptr = ctypes.c_void_p()
+    status = _libhip.hipEventCreateWithFlags(ctypes.byref(ptr), flags)
+    hipCheckStatus(status)
+    return ptr
+
+_libhip.hipEventCreate.restype = int
+_libhip.hipEventCreate.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+def hipEventCreate():
+    """
+    Create an event with the specified flags
+
+    Returns
+    -------
+    ptr : ctypes pointer
+        Pointer to the newly created event.
+
+    """
+    ptr = ctypes.c_void_p()
+    status = _libhip.hipEventCreate(ctypes.byref(ptr))
+    hipCheckStatus(status)
+    return ptr
+
+_libhip.hipEventRecord.restype = int
+_libhip.hipEventRecord.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+def hipEventRecord(event, stream=None):
+    """
+    Record an event in the specified stream.
+
+    Parameters
+    ----------
+    event : handle
+        event to record.
+    stream : _ctypes pointer, optional
+        stream in which to record event.
+
+    """
+    status = _libhip.hipEventRecord(event, stream)
+    hipCheckStatus(status)
+
+_libhip.hipEventDestroy.restype = int
+_libhip.hipEventDestroy.argtypes = [ctypes.c_void_p]
+def hipEventDestroy(ptr):
+    """
+    Destroy the specified event.
+
+    Parameters
+    ----------
+    event : ctypes pointer
+        Event to destroy.
+
+    """
+    status = _libhip.hipEventDestroy(ptr)
+    hipCheckStatus(status)
+
+_libhip.hipEventSynchronize.restype = int
+_libhip.hipEventSynchronize.argtypes = [ctypes.c_void_p]
+def hipEventSynchronize(ptr):
+    """
+    Wait for an event to complete.
+
+    This function will block until the event is ready, waiting for all previous work in the stream
+    specified when event was recorded with hipEventRecord().
+
+    If hipEventRecord() has not been called on @p event, this function returns immediately.
+
+    Parameters
+    ----------
+    event : ctypes pointer
+        Event to Synchronize.
+
+    """
+    status = _libhip.hipEventSynchronize(ptr)
+    hipCheckStatus(status)
+
+_libhip.hipEventElapsedTime.restype = int
+_libhip.hipEventElapsedTime.argtypes = [ctypes.POINTER(ctypes.c_float), ctypes.c_void_p, ctypes.c_void_p]
+def hipEventElapsedTime(start, stop):
+    """
+    Return the elapsed time between two events.
+
+    Computes the elapsed time between two events. Time is computed in ms, with
+    a resolution of approximately 1 us.
+
+    Events which are recorded in a NULL stream will block until all commands
+    on all other streams complete execution, and then record the timestamp.
+
+    Events which are recorded in a non-NULL stream will record their timestamp
+    when they reach the head of the specified stream, after all previous
+    commands in that stream have completed executing.  Thus the time that
+    the event recorded may be significantly after the host calls hipEventRecord().
+    Parameters
+    ----------
+    start : ctypes pointer
+        Start event.
+    stop : ctypes pointer
+        Stop event.
+    """
+    t = ctypes.c_float()
+    status = _libhip.hipEventElapsedTime(ctypes.byref(t), start, stop)
+    hipCheckStatus(status)
+    return t.value
+
+
 # Memory allocation functions (adapted from pystream):
 _libhip.hipMalloc.restype = int
 _libhip.hipMalloc.argtypes = [ctypes.POINTER(ctypes.c_void_p),
@@ -411,7 +637,7 @@ def hipMalloc(count, ctype=None):
     ptr = ctypes.c_void_p()
     status = _libhip.hipMalloc(ctypes.byref(ptr), count)
     hipCheckStatus(status)
-    if ctype != None:
+    if ctype is not None:
         ptr = ctypes.cast(ptr, ctypes.POINTER(ctype))
     return ptr
 
