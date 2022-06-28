@@ -2,10 +2,12 @@ from pyhip import hip
 import ctypes
 from itertools import repeat
 
+
 def test_hipMalloc():
     ptr = hip.hipMalloc(4)
     assert ptr != None
     hip.hipFree(ptr)
+
 
 def create_array(count):
     res = (ctypes.c_int * count)()
@@ -14,6 +16,7 @@ def create_array(count):
         res[j-1] = j
         j = j + 1
     return res
+
 
 def test_hipMemcpy():
     count = 10
