@@ -1,3 +1,5 @@
+from pyhip import hip, hiprtc
+import ctypes
 from itertools import repeat
 import time
 
@@ -16,6 +18,7 @@ def create_array():
         j = j + 1
     return cpu, gpu
 
+
 def cpu_axpy(a):
     result = list()
     j = 0
@@ -24,8 +27,7 @@ def cpu_axpy(a):
         j = j + 1
     return result
 
-from pyhip import hip, hiprtc
-import ctypes
+
 def gpu_axpy(res):
     source = """
     #if (HIP_VERSION_MAJOR == 4 && HIP_VERSION_MINOR <= 2)
@@ -41,7 +43,8 @@ def gpu_axpy(res):
     prog = hiprtc.hiprtcCreateProgram(source, 'axpy', [], [])
     device_properties = hip.hipGetDeviceProperties(0)
     print(f"Compiling kernel for {device_properties.gcnArchName}")
-    hiprtc.hiprtcCompileProgram(prog, [f'--offload-arch={device_properties.gcnArchName}'])
+    hiprtc.hiprtcCompileProgram(
+        prog, [f'--offload-arch={device_properties.gcnArchName}'])
     code = hiprtc.hiprtcGetCode(prog)
     module = hip.hipModuleLoadData(code)
     kernel = hip.hipModuleGetFunction(module, 'axpy')
@@ -53,13 +56,16 @@ def gpu_axpy(res):
                     ("y", ctypes.c_int),
                     ("size", ctypes.c_size_t)]
 
-    hip.hipMemcpy_htod(ptr, ctypes.byref(res), ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_htod(ptr, ctypes.byref(
+        res), ctypes.sizeof(ctypes.c_int) * size)
     struct = PackageStruct(ptr, 2, 3, size)
     block = int(size/1024) + 1
     hip.hipModuleLaunchKernel(kernel, block, 1, 1, 1024, 1, 1, 0, 0, struct)
-    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr, ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr,
+                       ctypes.sizeof(ctypes.c_int) * size)
     hip.hipFree(ptr)
     return res
+
 
 if __name__ == "__main__":
     cpu_array, gpu_array = create_array()
@@ -80,4 +86,3 @@ if __name__ == "__main__":
     else:
         print("Passed")
         print("CPU Time: ", (cend - start), " Gpu time: ", (gend - cend))
-
