@@ -4,12 +4,18 @@ Python interface to hiprtc
 
 import sys, ctypes
 
-# _libhiprtc_libname = 'libhiprtc.so' # Currently its the same library
-_libhiprtc_libname = 'libamdhip64.so'
+_libhiprtc_libname = 'libhiprtc.so'
+_libhiprtc_fallback_libname = 'libamdhip64.so' # Fall back library
 
 _libhiprtc = None
 if 'linux' in sys.platform:
-    _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_libname)
+    try:
+        _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_libname)
+    except:
+        _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_fallback_libname)
+    if _libhiprtc == None:
+        _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_fallback_libname)
+        
 else:
     # Currently we do not support windows, mainly because I do not have a windows build of hip
     raise RuntimeError('Only linux is supported')
