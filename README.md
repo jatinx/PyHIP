@@ -5,8 +5,6 @@ This small python lib which hooks into HIP library and provides pythonic interfa
 
 There are two parts of it, hip library and hiprtc library.
 
-Note: At the moment hiprtc is not a separate library.
-
 ## Example Usage
 ```python
 import ctypes
@@ -34,6 +32,14 @@ res = ctypes.c_int(0)
 hip.hipMemcpy_dtoh(ctypes.byref(res), ptr, 4)
 print(res.value)
 ```
+
+## Testing
+Testing is in it's infancy. I'll try to add more as and when I get some time. Any help here is appreciated :)
+
+### How to run tests
+Make sure you have ```pytest``` package installed.
+
+From the project folder run ```pytest ./tests/* -v -r A```
 
 ## Common Problems
  - Unable to load hip or hiprtc library - OSError: libamdhip64.so: cannot open shared object file: No such file or directory.
