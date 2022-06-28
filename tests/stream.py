@@ -31,6 +31,7 @@ def test_hipStreamCreation():
     res = create_res_array(count)
     hip.hipMemcpyAsync_htod(ptr, in_val, size, stream)
     hip.hipMemcpyAsync_dtoh(res, ptr, size, stream)
+    hip.hipStreamSynchronize(stream)
     for i in repeat(0, count):
         assert res[i] == in_val[i]
     hip.hipFree(ptr)

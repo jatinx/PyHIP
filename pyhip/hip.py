@@ -615,7 +615,7 @@ _libhip.hipEventDestroy.restype = int
 _libhip.hipEventDestroy.argtypes = [ctypes.c_void_p]
 
 
-def hipEventDestroy(ptr):
+def hipEventDestroy(event):
     """
     Destroy the specified event.
 
@@ -625,7 +625,7 @@ def hipEventDestroy(ptr):
         Event to destroy.
 
     """
-    status = _libhip.hipEventDestroy(ptr)
+    status = _libhip.hipEventDestroy(event)
     hipCheckStatus(status)
 
 
@@ -633,7 +633,7 @@ _libhip.hipEventSynchronize.restype = int
 _libhip.hipEventSynchronize.argtypes = [ctypes.c_void_p]
 
 
-def hipEventSynchronize(ptr):
+def hipEventSynchronize(event):
     """
     Wait for an event to complete.
 
@@ -648,7 +648,7 @@ def hipEventSynchronize(ptr):
         Event to Synchronize.
 
     """
-    status = _libhip.hipEventSynchronize(ptr)
+    status = _libhip.hipEventSynchronize(event)
     hipCheckStatus(status)
 
 
