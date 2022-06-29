@@ -43,6 +43,7 @@ From the project folder run ```pytest ./tests/* -v -r A```
 
 ## Help needed
 If you are an opensource developer and want to contribute to this project, I can use your help in several places depending on your skillset.
+- Packaging and release (to be able to install on machines via pip)
 - Adding more tests to the project
 - Adding API documentation and samples
 - Improving HIP API coverage - adding meaningful APIs instead of direct mapping.
