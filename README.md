@@ -41,6 +41,12 @@ Make sure you have ```pytest``` package installed.
 
 From the project folder run ```pytest ./tests/* -v -r A```
 
+## Help needed
+If you are an opensource developer and want to contribute to this project, I can use your help in several places depending on your skillset.
+- Adding more tests to the project
+- Adding API documentation and samples
+- Improving HIP API coverage - adding meaningful APIs instead of direct mapping.
+
 ## Common Problems
  - Unable to load hip or hiprtc library - OSError: libamdhip64.so: cannot open shared object file: No such file or directory.
 
