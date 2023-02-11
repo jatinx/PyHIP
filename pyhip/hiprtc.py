@@ -7,13 +7,17 @@ import ctypes
 
 _libhiprtc_libname = 'libhiprtc.so'
 _libhiprtc_fallback_libname = 'libamdhip64.so'  # Fall back library
+_libhiprtc_nv_libname = 'libnvhip64.so'
 
 _libhiprtc = None
 if 'linux' in sys.platform:
     try:
         _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_libname)
     except:
-        _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_fallback_libname)
+        try:
+            _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_fallback_libname)
+        except:
+            _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_nv_libname)
     if _libhiprtc == None:
         _libhiprtc = ctypes.cdll.LoadLibrary(_libhiprtc_fallback_libname)
 
