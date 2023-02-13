@@ -10,8 +10,12 @@ def test_hiprtcCompileProgram():
     assert prog != None
     device_properties = hip.hipGetDeviceProperties(0)
     assert device_properties != None
-    hiprtc.hiprtcCompileProgram(
-        prog, [f'--offload-arch={device_properties.gcnArchName}'])
+    plat = hip.hipGetPlatformName()
+    if plat == "amd":
+        hiprtc.hiprtcCompileProgram(
+            prog, [f'--offload-arch={device_properties.gcnArchName}'])
+    else:
+        hiprtc.hiprtcCompileProgram(prog, [])
     code = hiprtc.hiprtcGetCode(prog)
     assert code != None
     module = hip.hipModuleLoadData(code)
@@ -20,7 +24,7 @@ def test_hiprtcCompileProgram():
     assert kernel != None
     ptr = hip.hipMalloc(4)
     assert ptr != None
-    
+
     class PackageStruct(ctypes.Structure):
         _fields_ = [("a", ctypes.c_void_p)]
     struct = PackageStruct(ptr)

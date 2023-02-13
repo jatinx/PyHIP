@@ -5,17 +5,25 @@ Python interface to hip library
 import ctypes
 import sys
 
-_libhip_libname = 'libamdhip64.so'
-
 _libhip = None
+_hip_platform_name = ''
+
+# Try to find amd hip library, if not found, fallback to nvhip library
 if 'linux' in sys.platform:
-    _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
+    try:
+        _libhip_libname = 'libamdhip64.so'
+        _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
+        _hip_platform_name = 'amd'
+    except:
+        _libhip_libname = 'libnvhip64.so'
+        _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
+        _hip_platform_name = 'nvidia'
 else:
     # Currently we do not support windows, mainly because I do not have a windows build of hip
     raise RuntimeError('Only linux is supported')
 
 if _libhip is None:
-    raise OSError('hiprtc library not found')
+    raise OSError('hip (libamdhip64.so or libnvhip64.so) library not found')
 
 
 def POINTER(obj):
@@ -861,7 +869,7 @@ def hipMemcpyAsync_htod(dst, src, count, stream):
     """
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
-                                    hipMemcpyDeviceToHost, stream)
+                                    hipMemcpyHostToDevice, stream)
     hipCheckStatus(status)
 
 
@@ -1406,7 +1414,9 @@ def hipModuleLaunchKernel(kernel, bx, by, bz, tx, ty, tz, shared, stream, struct
     ctypes.sizeof(struct)
     hip_launch_param_buffer_ptr = ctypes.c_void_p(1)
     hip_launch_param_buffer_size = ctypes.c_void_p(2)
-    hip_launch_param_buffer_end = ctypes.c_void_p(3)
+    hip_launch_param_buffer_end = ctypes.c_void_p(0)
+    if _hip_platform_name == 'amd':
+        hip_launch_param_buffer_end = ctypes.c_void_p(3)
     size = ctypes.c_size_t(ctypes.sizeof(struct))
     p_size = ctypes.c_void_p(ctypes.addressof(size))
     p_struct = ctypes.c_void_p(ctypes.addressof(struct))
@@ -1449,3 +1459,12 @@ def hipInit(flags):
     c_flags = ctypes.c_uint(flags)
     status = _libhip.hipInit(c_flags)
     hipCheckStatus(status)
+
+
+def hipGetPlatformName():
+    """
+    Not a traditional HIP API
+
+    Returns: platform name, amd or nvidia
+    """
+    return _hip_platform_name
