@@ -5,17 +5,14 @@ from itertools import repeat
 
 def create_array(count):
     res = (ctypes.c_int * count)()
-    j = 1
-    for i in repeat(0, count):
-        res[j-1] = j
-        j = j + 1
+    for i in range(count):
+        res[i] = i + 1
     return res
 
 
 def create_res_array(count):
     res = (ctypes.c_int * count)()
-    j = 1
-    for i in repeat(0, count):
+    for i in range(count):
         res[i] = 0
     return res
 

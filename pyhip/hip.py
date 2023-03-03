@@ -15,9 +15,13 @@ if 'linux' in sys.platform:
         _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
         _hip_platform_name = 'amd'
     except:
-        _libhip_libname = 'libnvhip64.so'
-        _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
-        _hip_platform_name = 'nvidia'
+        try:
+            _libhip_libname = 'libnvhip64.so'
+            _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
+            _hip_platform_name = 'nvidia'
+        except:
+            raise RuntimeError(
+                'cant find libamdhip64.so or libnvhip64.so. make sure LD_LIBRARY_PATH is set')
 else:
     # Currently we do not support windows, mainly because I do not have a windows build of hip
     raise RuntimeError('Only linux is supported')
@@ -46,7 +50,7 @@ _libhip.hipGetErrorString.restype = ctypes.c_char_p
 _libhip.hipGetErrorString.argtypes = [ctypes.c_int]
 
 
-def hiprtcGetErrorString(e):
+def hipGetErrorString(e):
     """
     Retrieve hip error string.
 
@@ -65,7 +69,36 @@ def hiprtcGetErrorString(e):
 
     """
 
-    return _libhip.hipGetErrorString(e)
+    error = _libhip.hipGetErrorString(e)
+    return str(error)
+
+
+_libhip.hipGetErrorName.restype = ctypes.c_char_p
+_libhip.hipGetErrorName.argtypes = [ctypes.c_int]
+
+
+def hipGetErrorName(e):
+    """
+    Retrieve hip error string.
+
+    Return the string associated with the specified hiprtc error status
+    code.
+
+    Parameters
+    ----------
+    e : int
+        Error number.
+
+    Returns
+    -------
+    s : str
+        Error string.
+
+    """
+
+    error = _libhip.hipGetErrorName(e)
+    return str(error)
+
 
 # Generic hip error
 
@@ -896,6 +929,30 @@ def hipMemcpyAsync_dtoh(dst, src, count, stream):
     hipCheckStatus(status)
 
 
+def hipMemcpyAsync(dst, src, count, direction, stream):
+    """
+    Copy memory from src to dst.
+
+    Parameters
+    ----------
+    dst : ctypes pointer
+        Host memory pointer.
+    src : ctypes pointer
+        Device memory pointer.
+    count : int
+        Number of bytes to copy.
+    direction: int
+        Direction of memcpy
+    stream : ctypes pointer
+        Stream on which command is to be enqueued
+
+    """
+    status = _libhip.hipMemcpyAsync(dst, src,
+                                    ctypes.c_size_t(count),
+                                    hipMemcpyDeviceToHost, stream)
+    hipCheckStatus(status)
+
+
 _libhip.hipMemGetInfo.restype = int
 _libhip.hipMemGetInfo.argtypes = [ctypes.c_void_p,
                                   ctypes.c_void_p]
@@ -1468,3 +1525,97 @@ def hipGetPlatformName():
     Returns: platform name, amd or nvidia
     """
     return _hip_platform_name
+
+
+_libhip.hipGetDeviceCount.restype = int
+_libhip.hipGetDeviceCount.argtypes = [
+    ctypes.POINTER(ctypes.c_int)]
+
+
+def hipGetDeviceCount():
+    """
+    Get the total number of HIP devices in the system
+    """
+    c_count = ctypes.c_int(0)
+    status = _libhip.hipGetDeviceCount(
+        ctypes.byref(c_count))
+    hipCheckStatus(status)
+    return c_count.value
+
+
+hipDeviceAttributeComputeCapabilityMajor = 23
+hipDeviceAttributeComputeCapabilityMinor = 61
+_libhip.hipDeviceGetAttribute.restype = int
+_libhip.hipDeviceGetAttribute.argtypes = [
+    ctypes.POINTER(ctypes.c_int), ctypes.c_uint, ctypes.c_int]
+
+
+def hipDeviceGetAttribute(attribute, device):
+    """
+    Query the device attribute
+
+    Parameters
+    ----------
+    attribute : int
+    device : int
+    """
+    c_attr = ctypes.c_int(0)
+    c_attribute = ctypes.c_uint(attribute)
+    c_device = ctypes.c_int(device)
+    status = _libhip.hipDeviceGetAttribute(
+        ctypes.byref(c_attr), c_attribute, c_device)
+    hipCheckStatus(status)
+    return c_attr.value
+
+
+hipLimitMallocHeapSize = 2
+_libhip.hipDeviceSetLimit.restype = int
+_libhip.hipDeviceSetLimit.argtypes = [
+    ctypes.c_uint, ctypes.c_size_t]
+
+
+def hipDeviceSetLimit(attribute, value):
+    """
+    Set device limits
+
+    Parameters
+    ----------
+    attribute : int
+    device id : int
+    """
+    c_attribute = ctypes.c_uint(attribute)
+    c_value = ctypes.c_size_t(value)
+    status = _libhip.hipDeviceSetLimit(c_attribute, c_value)
+    hipCheckStatus(status)
+
+
+_libhip.hipDriverGetVersion.restype = int
+_libhip.hipDriverGetVersion.argtypes = [
+    ctypes.POINTER(ctypes.c_int)]
+
+
+def hipDriverGetVersion():
+    """
+    Return the driver version
+    """
+    c_version = ctypes.c_int(0)
+    status = _libhip.hipDriverGetVersion(
+        ctypes.byref(c_version))
+    hipCheckStatus(status)
+    return c_version.value
+
+
+_libhip.hipRuntimeGetVersion.restype = int
+_libhip.hipRuntimeGetVersion.argtypes = [
+    ctypes.POINTER(ctypes.c_int)]
+
+
+def hipRuntimeGetVersion():
+    """
+    Return the runtime version
+    """
+    c_version = ctypes.c_int(0)
+    status = _libhip.hipRuntimeGetVersion(
+        ctypes.byref(c_version))
+    hipCheckStatus(status)
+    return c_version.value
