@@ -949,7 +949,7 @@ def hipMemcpyAsync(dst, src, count, direction, stream):
     """
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
-                                    hipMemcpyDeviceToHost, stream)
+                                    direction, stream)
     hipCheckStatus(status)
 
 
