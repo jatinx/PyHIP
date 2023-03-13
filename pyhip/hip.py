@@ -4,6 +4,7 @@ Python interface to hip library
 
 import ctypes
 import sys
+from enum import Enum
 
 _libhip = None
 _hip_platform_name = ''
@@ -103,393 +104,67 @@ def hipGetErrorName(e):
 # Generic hip error
 
 
-class hipError(Exception):
-    """hip error"""
-    pass
-
-
-class hipErrorInvalidValue(hipError):
-    __doc__ = _libhip.hipGetErrorString(1)
-    pass
-
-
-class hipErrorOutOfMemory(hipError):
-    __doc__ = _libhip.hipGetErrorString(2)
-    pass
-
-
-class hipErrorNotInitialized(hipError):
-    __doc__ = _libhip.hipGetErrorString(3)
-    pass
-
-
-class hipErrorDeinitialized(hipError):
-    __doc__ = _libhip.hipGetErrorString(4)
-    pass
-
-
-class hipErrorProfilerDisabled(hipError):
-    __doc__ = _libhip.hipGetErrorString(5)
-    pass
-
-
-class hipErrorProfilerNotInitialized(hipError):
-    __doc__ = _libhip.hipGetErrorString(6)
-    pass
-
-
-class hipErrorProfilerAlreadyStarted(hipError):
-    __doc__ = _libhip.hipGetErrorString(7)
-    pass
-
-
-class hipErrorProfilerAlreadyStopped(hipError):
-    __doc__ = _libhip.hipGetErrorString(8)
-    pass
-
-
-class hipErrorInvalidConfiguration(hipError):
-    __doc__ = _libhip.hipGetErrorString(9)
-    pass
-
-
-class hipErrorInvalidSymbol(hipError):
-    __doc__ = _libhip.hipGetErrorString(13)
-    pass
-
-
-class hipErrorInvalidDevicePointer(hipError):
-    __doc__ = _libhip.hipGetErrorString(17)
-    pass
-
-
-class hipErrorInvalidMemcpyDirection(hipError):
-    __doc__ = _libhip.hipGetErrorString(21)
-    pass
-
-
-class hipErrorInsufficientDriver(hipError):
-    __doc__ = _libhip.hipGetErrorString(35)
-    pass
-
-
-class hipErrorMissingConfiguration(hipError):
-    __doc__ = _libhip.hipGetErrorString(52)
-    pass
-
-
-class hipErrorPriorLaunchFailure(hipError):
-    __doc__ = _libhip.hipGetErrorString(53)
-    pass
-
-
-class hipErrorInvalidDeviceFunction(hipError):
-    __doc__ = _libhip.hipGetErrorString(98)
-    pass
-
-
-class hipErrorNoDevice(hipError):
-    __doc__ = _libhip.hipGetErrorString(100)
-    pass
-
-
-class hipErrorInvalidDevice(hipError):
-    __doc__ = _libhip.hipGetErrorString(101)
-    pass
-
-
-class hipErrorInvalidImage(hipError):
-    __doc__ = _libhip.hipGetErrorString(200)
-    pass
-
-
-class hipErrorInvalidContext(hipError):
-    __doc__ = _libhip.hipGetErrorString(201)
-    pass
-
-
-class hipErrorContextAlreadyCurrent(hipError):
-    __doc__ = _libhip.hipGetErrorString(202)
-    pass
-
-
-class hipErrorMapFailed(hipError):
-    __doc__ = _libhip.hipGetErrorString(205)
-    pass
-
-
-class hipErrorUnmapFailed(hipError):
-    __doc__ = _libhip.hipGetErrorString(206)
-    pass
-
-
-class hipErrorArrayIsMapped(hipError):
-    __doc__ = _libhip.hipGetErrorString(207)
-    pass
-
-
-class hipErrorAlreadyMapped(hipError):
-    __doc__ = _libhip.hipGetErrorString(208)
-    pass
-
-
-class hipErrorNoBinaryForGpu(hipError):
-    __doc__ = _libhip.hipGetErrorString(209)
-    pass
-
-
-class hipErrorAlreadyAcquired(hipError):
-    __doc__ = _libhip.hipGetErrorString(210)
-    pass
-
-
-class hipErrorNotMapped(hipError):
-    __doc__ = _libhip.hipGetErrorString(211)
-    pass
-
-
-class hipErrorNotMappedAsArray(hipError):
-    __doc__ = _libhip.hipGetErrorString(212)
-    pass
-
-
-class hipErrorNotMappedAsPointer(hipError):
-    __doc__ = _libhip.hipGetErrorString(213)
-    pass
-
-
-class hipErrorECCNotCorrectable(hipError):
-    __doc__ = _libhip.hipGetErrorString(214)
-    pass
-
-
-class hipErrorUnsupportedLimit(hipError):
-    __doc__ = _libhip.hipGetErrorString(215)
-    pass
-
-
-class hipErrorContextAlreadyInUse(hipError):
-    __doc__ = _libhip.hipGetErrorString(216)
-    pass
-
-
-class hipErrorPeerAccessUnsupported(hipError):
-    __doc__ = _libhip.hipGetErrorString(217)
-    pass
-
-
-class hipErrorInvalidKernelFile(hipError):
-    __doc__ = _libhip.hipGetErrorString(218)
-    pass
-
-
-class hipErrorInvalidGraphicsContext(hipError):
-    __doc__ = _libhip.hipGetErrorString(219)
-    pass
-
-
-class hipErrorInvalidSource(hipError):
-    __doc__ = _libhip.hipGetErrorString(300)
-    pass
-
-
-class hipErrorFileNotFound(hipError):
-    __doc__ = _libhip.hipGetErrorString(301)
-    pass
-
-
-class hipErrorSharedObjectSymbolNotFound(hipError):
-    __doc__ = _libhip.hipGetErrorString(302)
-    pass
-
-
-class hipErrorSharedObjectInitFailed(hipError):
-    __doc__ = _libhip.hipGetErrorString(303)
-    pass
-
-
-class hipErrorOperatingSystem(hipError):
-    __doc__ = _libhip.hipGetErrorString(304)
-    pass
-
-
-class hipErrorInvalidHandle(hipError):
-    __doc__ = _libhip.hipGetErrorString(400)
-    pass
-
-
-class hipErrorNotFound(hipError):
-    __doc__ = _libhip.hipGetErrorString(500)
-    pass
-
-
-class hipErrorNotReady(hipError):
-    __doc__ = _libhip.hipGetErrorString(600)
-    pass
-
-
-class hipErrorIllegalAddress(hipError):
-    __doc__ = _libhip.hipGetErrorString(700)
-    pass
-
-
-class hipErrorLaunchOutOfResources(hipError):
-    __doc__ = _libhip.hipGetErrorString(701)
-    pass
-
-
-class hipErrorLaunchTimeOut(hipError):
-    __doc__ = _libhip.hipGetErrorString(702)
-    pass
-
-
-class hipErrorPeerAccessAlreadyEnabled(hipError):
-    __doc__ = _libhip.hipGetErrorString(704)
-    pass
-
-
-class hipErrorPeerAccessNotEnabled(hipError):
-    __doc__ = _libhip.hipGetErrorString(705)
-    pass
-
-
-class hipErrorSetOnActiveProcess(hipError):
-    __doc__ = _libhip.hipGetErrorString(708)
-    pass
-
-
-class hipErrorAssert(hipError):
-    __doc__ = _libhip.hipGetErrorString(710)
-    pass
-
-
-class hipErrorHostMemoryAlreadyRegistered(hipError):
-    __doc__ = _libhip.hipGetErrorString(712)
-    pass
-
-
-class hipErrorHostMemoryNotRegistered(hipError):
-    __doc__ = _libhip.hipGetErrorString(713)
-    pass
-
-
-class hipErrorLaunchFailure(hipError):
-    __doc__ = _libhip.hipGetErrorString(719)
-    pass
-
-
-class hipErrorCooperativeLaunchTooLarge(hipError):
-    __doc__ = _libhip.hipGetErrorString(720)
-    pass
-
-
-class hipErrorNotSupported(hipError):
-    __doc__ = _libhip.hipGetErrorString(801)
-    pass
-
-
-class hipErrorUnknown(hipError):
-    __doc__ = _libhip.hipGetErrorString(999)
-    pass
-
-
-class hipErrorRuntimeMemory(hipError):
-    __doc__ = _libhip.hipGetErrorString(1052)
-    pass
-
-
-class hipErrorRuntimeOther(hipError):
-    __doc__ = _libhip.hipGetErrorString(1053)
-    pass
-
-
-hipExceptions = {
-    1: hipErrorInvalidValue,
-    2: hipErrorOutOfMemory,
-    3: hipErrorNotInitialized,
-    4: hipErrorDeinitialized,
-    5: hipErrorProfilerDisabled,
-    6: hipErrorProfilerNotInitialized,
-    7: hipErrorProfilerAlreadyStarted,
-    8: hipErrorProfilerAlreadyStopped,
-    9: hipErrorInvalidConfiguration,
-    13: hipErrorInvalidSymbol,
-    17: hipErrorInvalidDevicePointer,
-    21: hipErrorInvalidMemcpyDirection,
-    35: hipErrorInsufficientDriver,
-    52: hipErrorMissingConfiguration,
-    53: hipErrorPriorLaunchFailure,
-    98: hipErrorInvalidDeviceFunction,
-    100: hipErrorNoDevice,
-    101: hipErrorInvalidDevice,
-    200: hipErrorInvalidImage,
-    201: hipErrorInvalidContext,
-    202: hipErrorContextAlreadyCurrent,
-    205: hipErrorMapFailed,
-    206: hipErrorUnmapFailed,
-    207: hipErrorArrayIsMapped,
-    208: hipErrorAlreadyMapped,
-    209: hipErrorNoBinaryForGpu,
-    210: hipErrorAlreadyAcquired,
-    211: hipErrorNotMapped,
-    212: hipErrorNotMappedAsArray,
-    213: hipErrorNotMappedAsPointer,
-    214: hipErrorECCNotCorrectable,
-    215: hipErrorUnsupportedLimit,
-    216: hipErrorContextAlreadyInUse,
-    217: hipErrorPeerAccessUnsupported,
-    218: hipErrorInvalidKernelFile,
-    219: hipErrorInvalidGraphicsContext,
-    300: hipErrorInvalidSource,
-    301: hipErrorFileNotFound,
-    302: hipErrorSharedObjectSymbolNotFound,
-    303: hipErrorSharedObjectInitFailed,
-    304: hipErrorOperatingSystem,
-    400: hipErrorInvalidHandle,
-    500: hipErrorNotFound,
-    600: hipErrorNotReady,
-    700: hipErrorIllegalAddress,
-    701: hipErrorLaunchOutOfResources,
-    702: hipErrorLaunchTimeOut,
-    704: hipErrorPeerAccessAlreadyEnabled,
-    705: hipErrorPeerAccessNotEnabled,
-    708: hipErrorSetOnActiveProcess,
-    710: hipErrorAssert,
-    712: hipErrorHostMemoryAlreadyRegistered,
-    713: hipErrorHostMemoryNotRegistered,
-    719: hipErrorLaunchFailure,
-    720: hipErrorCooperativeLaunchTooLarge,
-    801: hipErrorNotSupported,
-    999: hipErrorUnknown,
-    1052: hipErrorRuntimeMemory,
-    1053: hipErrorRuntimeOther
-}
-
-
-def hipCheckStatus(status):
-    """
-    Raise hip exception.
-
-    Raise an exception corresponding to the specified hip runtime error
-    code.
-
-    Parameters
-    ----------
-    status : int
-        hip runtime error code.
-
-    See Also
-    --------
-    hipExceptions
-    """
-
-    if status != 0:
-        try:
-            e = hipExceptions[status]
-        except KeyError:
-            raise hipError('unknown hip error %s' % status)
-        else:
-            raise e
+class hipError(Enum):
+    hipSuccess = 0
+    hipErrorInvalidValue = 1
+    hipErrorOutOfMemory = 2
+    hipErrorNotInitialized = 3,
+    hipErrorDeinitialized = 4,
+    hipErrorProfilerDisabled = 5,
+    hipErrorProfilerNotInitialized = 6,
+    hipErrorProfilerAlreadyStarted = 7,
+    hipErrorProfilerAlreadyStopped = 8,
+    hipErrorInvalidConfiguration = 9,
+    hipErrorInvalidSymbol = 13,
+    hipErrorInvalidDevicePointer = 17,
+    hipErrorInvalidMemcpyDirection = 24,
+    hipErrorInsufficientDriver = 35,
+    hipErrorMissingConfiguration = 52,
+    hipErrorPriorLaunchFailure = 53,
+    hipErrorInvalidDeviceFunction = 98
+    hipErrorNoDevice = 100
+    hipErrorInvalidDevice = 101
+    hipErrorInvalidImage = 200
+    hipErrorInvalidContext = 201
+    hipErrorContextAlreadyCurrent = 202
+    hipErrorMapFailed = 205
+    hipErrorUnmapFailed = 206
+    hipErrorArrayIsMapped = 207
+    hipErrorAlreadyMapped = 208
+    hipErrorNoBinaryForGpu = 209
+    hipErrorAlreadyAcquired = 210
+    hipErrorNotMapped = 211
+    hipErrorNotMappedAsArray = 212
+    hipErrorNotMappedAsPointer = 213
+    hipErrorECCNotCorrectable = 214
+    hipErrorUnsupportedLimit = 215
+    hipErrorContextAlreadyInUse = 216
+    hipErrorPeerAccessUnsupported = 217
+    hipErrorInvalidKernelFile = 218
+    hipErrorInvalidGraphicsContext = 219
+    hipErrorInvalidSource = 300
+    hipErrorFileNotFound = 301
+    hipErrorSharedObjectSymbolNotFound = 302
+    hipErrorSharedObjectInitFailed = 303
+    hipErrorOperatingSystem = 304
+    hipErrorInvalidHandle = 400
+    hipErrorNotFound = 500
+    hipErrorNotReady = 600
+    hipErrorIllegalAddress = 700
+    hipErrorLaunchOutOfResources = 701
+    hipErrorLaunchTimeOut = 702
+    hipErrorPeerAccessAlreadyEnabled = 704
+    hipErrorPeerAccessNotEnabled = 705
+    hipErrorSetOnActiveProcess = 708
+    hipErrorAssert = 710
+    hipErrorHostMemoryAlreadyRegistered = 712
+    hipErrorHostMemoryNotRegistered = 713
+    hipErrorLaunchFailure = 719
+    hipErrorCooperativeLaunchTooLarge = 720
+    hipErrorNotSupported = 801
+    hipErrorUnknown = 999
+    hipErrorRuntimeMemory = 1052
+    hipErrorRuntimeOthe = 1053
 
 # Stream management
 
@@ -514,8 +189,7 @@ def hipStreamCreate():
     """
     ptr = ctypes.c_void_p()
     status = _libhip.hipStreamCreate(ctypes.byref(ptr))
-    hipCheckStatus(status)
-    return ptr
+    return (hipError(status), ptr)
 
 
 _libhip.hipStreamDestroy.restype = int
@@ -538,7 +212,7 @@ def hipStreamDestroy(ptr):
         Valid pointer to stream object.
     """
     status = _libhip.hipStreamDestroy(ptr)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipStreamSynchronize.restype = int
@@ -564,7 +238,7 @@ def hipStreamSynchronize(ptr):
         Valid pointer to stream object.
     """
     status = _libhip.hipStreamSynchronize(ptr)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 # Event management
 
@@ -608,8 +282,7 @@ def hipEventCreateWithFlags(flags):
     """
     ptr = ctypes.c_void_p()
     status = _libhip.hipEventCreateWithFlags(ctypes.byref(ptr), flags)
-    hipCheckStatus(status)
-    return ptr
+    return (hipError(status), ptr)
 
 
 _libhip.hipEventCreate.restype = int
@@ -628,8 +301,7 @@ def hipEventCreate():
     """
     ptr = ctypes.c_void_p()
     status = _libhip.hipEventCreate(ctypes.byref(ptr))
-    hipCheckStatus(status)
-    return ptr
+    return (hipError(status), ptr)
 
 
 _libhip.hipEventRecord.restype = int
@@ -649,7 +321,7 @@ def hipEventRecord(event, stream=None):
 
     """
     status = _libhip.hipEventRecord(event, stream)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipEventDestroy.restype = int
@@ -667,7 +339,7 @@ def hipEventDestroy(event):
 
     """
     status = _libhip.hipEventDestroy(event)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipEventSynchronize.restype = int
@@ -690,7 +362,7 @@ def hipEventSynchronize(event):
 
     """
     status = _libhip.hipEventSynchronize(event)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipEventElapsedTime.restype = int
@@ -721,8 +393,7 @@ def hipEventElapsedTime(start, stop):
     """
     t = ctypes.c_float()
     status = _libhip.hipEventElapsedTime(ctypes.byref(t), start, stop)
-    hipCheckStatus(status)
-    return t.value
+    return (hipError(status), t.value)
 
 
 # Memory allocation functions (adapted from pystream):
@@ -754,10 +425,9 @@ def hipMalloc(count, ctype=None):
 
     ptr = ctypes.c_void_p()
     status = _libhip.hipMalloc(ctypes.byref(ptr), count)
-    hipCheckStatus(status)
     if ctype is not None:
         ptr = ctypes.cast(ptr, ctypes.POINTER(ctype))
-    return ptr
+    return (hipError(status), ptr)
 
 
 _libhip.hipFree.restype = int
@@ -779,7 +449,7 @@ def hipFree(ptr):
     """
 
     status = _libhip.hipFree(ptr)
-    hipCheckStatus(status)
+    return (hipError(status), )
 
 
 _libhip.hipMallocPitch.restype = int
@@ -817,8 +487,7 @@ def hipMallocPitch(pitch, rows, cols, elesize):
     status = _libhip.hipMallocPitch(ctypes.byref(ptr),
                                     ctypes.c_size_t(pitch), cols*elesize,
                                     rows)
-    hipCheckStatus(status)
-    return ptr, pitch
+    return (hipError(status), ptr, pitch)
 
 
 # Memory copy modes:
@@ -853,7 +522,7 @@ def hipMemcpy_htod(dst, src, count):
     status = _libhip.hipMemcpy(dst, src,
                                ctypes.c_size_t(count),
                                hipMemcpyHostToDevice)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 def hipMemcpy_dtoh(dst, src, count):
@@ -876,7 +545,7 @@ def hipMemcpy_dtoh(dst, src, count):
     status = _libhip.hipMemcpy(dst, src,
                                ctypes.c_size_t(count),
                                hipMemcpyDeviceToHost)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipMemcpyAsync.restype = int
@@ -903,7 +572,7 @@ def hipMemcpyAsync_htod(dst, src, count, stream):
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
                                     hipMemcpyHostToDevice, stream)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 def hipMemcpyAsync_dtoh(dst, src, count, stream):
@@ -926,7 +595,7 @@ def hipMemcpyAsync_dtoh(dst, src, count, stream):
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
                                     hipMemcpyDeviceToHost, stream)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 def hipMemcpyAsync(dst, src, count, direction, stream):
@@ -950,7 +619,7 @@ def hipMemcpyAsync(dst, src, count, direction, stream):
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
                                     direction, stream)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipMemGetInfo.restype = int
@@ -975,8 +644,7 @@ def hipMemGetInfo():
     total = ctypes.c_size_t()
     status = _libhip.hipMemGetInfo(ctypes.byref(free),
                                    ctypes.byref(total))
-    hipCheckStatus(status)
-    return free.value, total.value
+    return (hipError(status), free.value, total.value)
 
 
 _libhip.hipSetDevice.restype = int
@@ -997,7 +665,7 @@ def hipSetDevice(dev):
     """
 
     status = _libhip.hipSetDevice(dev)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipGetDevice.restype = int
@@ -1020,8 +688,7 @@ def hipGetDevice():
 
     dev = ctypes.c_int()
     status = _libhip.hipGetDevice(ctypes.byref(dev))
-    hipCheckStatus(status)
-    return dev.value
+    return (hipError(status), dev.value)
 
 
 class hipDeviceArch(ctypes.Structure):
@@ -1293,8 +960,7 @@ def hipGetDeviceProperties(deviceId: int):
     device_properties = hipDeviceProperties()
     status = _libhip.hipGetDeviceProperties(ctypes.pointer(device_properties),
                                             deviceId)
-    hipCheckStatus(status)
-    return device_properties
+    return (hipError(status), device_properties)
 
 
 # Memory types:
@@ -1341,8 +1007,7 @@ def hipPointerGetAttributes(ptr):
     attributes = hipPointerAttributes()
     status = \
         _libhip.hipPointerGetAttributes(ctypes.byref(attributes), ptr)
-    hipCheckStatus(status)
-    return attributes.memoryType, attributes.device
+    return (hipError(status), attributes.memoryType, attributes.device)
 
 
 _libhip.hipModuleLoadData.restype = int
@@ -1367,8 +1032,7 @@ def hipModuleLoadData(data):
 
     module = ctypes.c_void_p()
     status = _libhip.hipModuleLoadData(ctypes.byref(module), data)
-    hipCheckStatus(status)
-    return module
+    return (hipError(status), module)
 
 
 _libhip.hipModuleGetFunction.restype = int
@@ -1397,8 +1061,7 @@ def hipModuleGetFunction(module, func_name):
     kernel = ctypes.c_void_p()
     status = _libhip.hipModuleGetFunction(
         ctypes.byref(kernel), module, e_func_name)
-    hipCheckStatus(status)
-    return kernel
+    return (hipError(status), kernel)
 
 
 _libhip.hipModuleUnload.restype = int
@@ -1415,7 +1078,7 @@ def hipModuleUnload(module):
         pointer to created module
     """
     status = _libhip.hipModuleUnload(module)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipModuleLaunchKernel.restype = int
@@ -1483,7 +1146,7 @@ def hipModuleLaunchKernel(kernel, bx, by, bz, tx, ty, tz, shared, stream, struct
 
     status = _libhip.hipModuleLaunchKernel(
         kernel, c_bx, c_by, c_bz, c_tx, c_ty, c_tz, c_shared, stream, None, config)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipDeviceSynchronize.restype = int
@@ -1495,7 +1158,7 @@ def hipDeviceSynchronize():
     Device level sync
     """
     status = _libhip.hipDeviceSynchronize()
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipInit.restype = int
@@ -1515,7 +1178,7 @@ def hipInit(flags):
     """
     c_flags = ctypes.c_uint(flags)
     status = _libhip.hipInit(c_flags)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 def hipGetPlatformName():
@@ -1539,8 +1202,7 @@ def hipGetDeviceCount():
     c_count = ctypes.c_int(0)
     status = _libhip.hipGetDeviceCount(
         ctypes.byref(c_count))
-    hipCheckStatus(status)
-    return c_count.value
+    return (hipError(status), c_count.value)
 
 
 hipDeviceAttributeComputeCapabilityMajor = 23
@@ -1564,8 +1226,7 @@ def hipDeviceGetAttribute(attribute, device):
     c_device = ctypes.c_int(device)
     status = _libhip.hipDeviceGetAttribute(
         ctypes.byref(c_attr), c_attribute, c_device)
-    hipCheckStatus(status)
-    return c_attr.value
+    return (hipError(status), c_attr.value)
 
 
 hipLimitMallocHeapSize = 2
@@ -1586,7 +1247,7 @@ def hipDeviceSetLimit(attribute, value):
     c_attribute = ctypes.c_uint(attribute)
     c_value = ctypes.c_size_t(value)
     status = _libhip.hipDeviceSetLimit(c_attribute, c_value)
-    hipCheckStatus(status)
+    return (hipError(status),)
 
 
 _libhip.hipDriverGetVersion.restype = int
@@ -1601,8 +1262,7 @@ def hipDriverGetVersion():
     c_version = ctypes.c_int(0)
     status = _libhip.hipDriverGetVersion(
         ctypes.byref(c_version))
-    hipCheckStatus(status)
-    return c_version.value
+    return (hipError(status), c_version.value)
 
 
 _libhip.hipRuntimeGetVersion.restype = int
@@ -1617,5 +1277,4 @@ def hipRuntimeGetVersion():
     c_version = ctypes.c_int(0)
     status = _libhip.hipRuntimeGetVersion(
         ctypes.byref(c_version))
-    hipCheckStatus(status)
-    return c_version.value
+    return (hipError(status), c_version.value)

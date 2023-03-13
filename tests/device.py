@@ -1,32 +1,51 @@
-from pyhip import hip
+from pyhip import hip, hiprtc
+
+
+def ASSERT_DRV(err):
+    if isinstance(err, hip.hipError):
+        if err != hip.hipError.hipSuccess:
+            raise RuntimeError("HIP Error: {}".format(err))
+    elif isinstance(err, hiprtc.hiprtcError):
+        if err != hiprtc.hiprtcError.hiprtcSuccess:
+            raise RuntimeError("HIPRTC Error: {}".format(err))
+    else:
+        raise RuntimeError("Unknown error type: {}".format(err))
 
 
 def test_hipGetDeviceCount():
-    device_count = hip.hipGetDeviceCount()
+    (hres, device_count) = hip.hipGetDeviceCount()
+    ASSERT_DRV(hres)
     assert device_count != 0
 
 
 def test_hipDeviceGetAttribute():
-    device_count = hip.hipGetDeviceCount()
+    (hres, device_count) = hip.hipGetDeviceCount()
+    ASSERT_DRV(hres)
     assert device_count != 0
     for i in range(0, device_count):
-        major = hip.hipDeviceGetAttribute(
+        (hres, major) = hip.hipDeviceGetAttribute(
             hip.hipDeviceAttributeComputeCapabilityMajor, i)
-        minor = hip.hipDeviceGetAttribute(
+        ASSERT_DRV(hres)
+        (hres, minor) = hip.hipDeviceGetAttribute(
             hip.hipDeviceAttributeComputeCapabilityMinor, i)
+        ASSERT_DRV(hres)
         assert major != 0
         assert minor != 0
 
 
 def test_hipDeviceSetLimit():
-    device_count = hip.hipGetDeviceCount()
+    (hres, device_count) = hip.hipGetDeviceCount()
+    ASSERT_DRV(hres)
     assert device_count != 0
     for _ in range(0, device_count):
-        hip.hipDeviceSetLimit(hip.hipLimitMallocHeapSize, 0)
+        (hres, ) = hip.hipDeviceSetLimit(hip.hipLimitMallocHeapSize, 0)
+        ASSERT_DRV(hres)
 
 
 def test_hipVersion():
-    driver_version = hip.hipDriverGetVersion()
+    (hres, driver_version) = hip.hipDriverGetVersion()
+    ASSERT_DRV(hres)
     assert driver_version != 0
-    runtime_version = hip.hipRuntimeGetVersion()
+    (hres, runtime_version) = hip.hipRuntimeGetVersion()
+    ASSERT_DRV(hres)
     runtime_version != 0

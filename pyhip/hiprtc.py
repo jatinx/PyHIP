@@ -4,6 +4,7 @@ Python interface to hiprtc
 
 import sys
 import ctypes
+from enum import Enum
 
 _libhiprtc_libname = 'libhiprtc.so'
 _libhiprtc_fallback_libname = 'libamdhip64.so'  # Fall back library
@@ -70,92 +71,20 @@ def hiprtcGetErrorString(e):
 
     return _libhiprtc.hiprtcGetErrorString(e)
 
-# Generic hiprtc Error
 
-
-class hiprtcError(Exception):
-    """hiprtc error."""
-    pass
-
-
-class hiprtcErrorOutOfMemory(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(1)
-    pass
-
-
-class hiprtcErrorProgramCreationFailure(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(2)
-    pass
-
-
-class hiprtcErrorInvalidInput(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(3)
-    pass
-
-
-class hiprtcErrorInvalidProgram(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(4)
-    pass
-
-
-class hiprtcErrorInvalidOption(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(5)
-    pass
-
-
-class hiprtcErrorCompilation(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(6)
-    pass
-
-
-class hiprtcErrorBuiltinOperationFailure(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(7)
-    pass
-
-
-class hiprtcErrorNoNameExpressionAfterCompilation(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(8)
-    pass
-
-
-class hiprtcErrorNoLoweredNamesBeforeCompilation(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(9)
-    pass
-
-
-class hiprtcErrorNameExpressionNotValid(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(10)
-    pass
-
-
-class hiprtcErrorInternalError(hiprtcError):
-    __doc__ = _libhiprtc.hiprtcGetErrorString(11)
-    pass
-
-
-hiprtcExceptions = {
-    1: hiprtcErrorOutOfMemory,
-    2: hiprtcErrorProgramCreationFailure,
-    3: hiprtcErrorInvalidInput,
-    4: hiprtcErrorInvalidProgram,
-    5: hiprtcErrorInvalidOption,
-    6: hiprtcErrorCompilation,
-    7: hiprtcErrorBuiltinOperationFailure,
-    8: hiprtcErrorNoNameExpressionAfterCompilation,
-    9: hiprtcErrorNoLoweredNamesBeforeCompilation,
-    10: hiprtcErrorNameExpressionNotValid,
-    11: hiprtcErrorInternalError
-}
-
-
-def hiprtcCheckStatus(status):
-    if status != 0:
-        try:
-            e = hiprtcExceptions[status]
-        except KeyError:
-            raise hiprtcError('unknown hiprtc error %s' % status)
-        else:
-            raise e
+class hiprtcError(Enum):
+    hiprtcSuccess = 0
+    hiprtcErrorOutOfMemory = 1
+    hiprtcErrorProgramCreationFailure = 2
+    hiprtcErrorInvalidInput = 3
+    hiprtcErrorInvalidProgram = 4
+    hiprtcErrorInvalidOption = 5
+    hiprtcErrorCompilation = 6
+    hiprtcErrorBuiltinOperationFailure = 7
+    hiprtcErrorNoNameExpressionAfterCompilation = 8
+    hiprtcErrorNoLoweredNamesBeforeCompilation = 9
+    hiprtcErrorNameExpressionNotValid = 10
+    hiprtcErrorInternalError = 11
 
 
 _libhiprtc.hiprtcCreateProgram.restype = int
@@ -211,8 +140,7 @@ def hiprtcCreateProgram(source, name, header_names, header_sources):
 
     status = _libhiprtc.hiprtcCreateProgram(ctypes.byref(
         prog), e_source, e_name, len(e_header_names), c_header_sources, c_header_names)
-    hiprtcCheckStatus(status)
-    return prog
+    return (hiprtcError(status), prog)
 
 
 _libhiprtc.hiprtcDestroyProgram.restype = int
@@ -230,7 +158,7 @@ def hiprtcDestroyProgram(prog):
         hiprtc program handle
     """
     status = _libhiprtc.hiprtcDestroyProgram(ctypes.byref(prog))
-    hiprtcCheckStatus(status)
+    return (hiprtcError(status), )
 
 
 _libhiprtc.hiprtcAddNameExpression.restype = int
@@ -251,7 +179,7 @@ def hiprtcAddNameExpression(prog, expression):
     """
     e_expression = expression.encode('utf-8')
     status = _libhiprtc.hiprtcAddNameExpression(prog, e_expression)
-    hiprtcCheckStatus(status)
+    return (hiprtcError(status), )
 
 
 _libhiprtc.hiprtcCompileProgram.restype = int
@@ -278,7 +206,7 @@ def hiprtcCompileProgram(prog, options):
     c_options = (ctypes.c_char_p * len(e_options))()
     c_options[:] = e_options
     status = _libhiprtc.hiprtcCompileProgram(prog, len(c_options), c_options)
-    hiprtcCheckStatus(status)
+    return (hiprtcError(status), )
 
 
 _libhiprtc.hiprtcGetProgramLogSize.restype = int
@@ -305,13 +233,11 @@ def hiprtcGetProgramLog(prog):
     """
     log_size = ctypes.c_size_t()
     status = _libhiprtc.hiprtcGetProgramLogSize(prog, ctypes.byref(log_size))
-    hiprtcCheckStatus(status)
 
     log = "0" * log_size.value
     e_log = log.encode('utf-8')
     status = _libhiprtc.hiprtcGetProgramLog(prog, e_log)
-    hiprtcCheckStatus(status)
-    return e_log.decode('utf-8')
+    return (hiprtcError(status), e_log.decode('utf-8'))
 
 
 _libhiprtc.hiprtcGetCodeSize.restype = int
@@ -338,10 +264,8 @@ def hiprtcGetCode(prog):
     """
     code_size = ctypes.c_size_t()
     status = _libhiprtc.hiprtcGetCodeSize(prog, ctypes.byref(code_size))
-    hiprtcCheckStatus(status)
 
     code = "0" * code_size.value
     e_code = code.encode('utf-8')
     status = _libhiprtc.hiprtcGetCode(prog, e_code)
-    hiprtcCheckStatus(status)
-    return e_code
+    return (hiprtcError(status), e_code)
