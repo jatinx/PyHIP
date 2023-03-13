@@ -65,10 +65,10 @@ def test_hipMemcpyAsync():
     in_val = create_array(count)
     res = create_res_array(count)
     (hres,) = hip.hipMemcpyAsync(
-        ptr, in_val, size, hip.hipMemcpyHostToDevice, stream)
+        ptr, in_val, size, hip.hipMemcpyKind.hipMemcpyHostToDevice, stream)
     ASSERT_DRV(hres)
     (hres,) = hip.hipMemcpyAsync(
-        res, ptr, size, hip.hipMemcpyDeviceToHost, stream)
+        res, ptr, size, hip.hipMemcpyKind.hipMemcpyDeviceToHost, stream)
     ASSERT_DRV(hres)
     (hres,) = hip.hipStreamSynchronize(stream)
     ASSERT_DRV(hres)

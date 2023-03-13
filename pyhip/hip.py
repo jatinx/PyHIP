@@ -4,7 +4,7 @@ Python interface to hip library
 
 import ctypes
 import sys
-from enum import Enum
+from enum import IntEnum
 
 _libhip = None
 _hip_platform_name = ''
@@ -104,7 +104,7 @@ def hipGetErrorName(e):
 # Generic hip error
 
 
-class hipError(Enum):
+class hipError(IntEnum):
     hipSuccess = 0
     hipErrorInvalidValue = 1
     hipErrorOutOfMemory = 2
@@ -491,11 +491,13 @@ def hipMallocPitch(pitch, rows, cols, elesize):
 
 
 # Memory copy modes:
-hipMemcpyHostToHost = 0
-hipMemcpyHostToDevice = 1
-hipMemcpyDeviceToHost = 2
-hipMemcpyDeviceToDevice = 3
-hipMemcpyDefault = 4
+class hipMemcpyKind(IntEnum):
+    hipMemcpyHostToHost = 0
+    hipMemcpyHostToDevice = 1
+    hipMemcpyDeviceToHost = 2
+    hipMemcpyDeviceToDevice = 3
+    hipMemcpyDefault = 4
+
 
 _libhip.hipMemcpy.restype = int
 _libhip.hipMemcpy.argtypes = [ctypes.c_void_p, ctypes.c_void_p,
@@ -521,7 +523,7 @@ def hipMemcpy_htod(dst, src, count):
 
     status = _libhip.hipMemcpy(dst, src,
                                ctypes.c_size_t(count),
-                               hipMemcpyHostToDevice)
+                               int(hipMemcpyKind.hipMemcpyHostToDevice))
     return (hipError(status),)
 
 
@@ -544,7 +546,7 @@ def hipMemcpy_dtoh(dst, src, count):
 
     status = _libhip.hipMemcpy(dst, src,
                                ctypes.c_size_t(count),
-                               hipMemcpyDeviceToHost)
+                               int(hipMemcpyKind.hipMemcpyDeviceToHost))
     return (hipError(status),)
 
 
@@ -571,7 +573,7 @@ def hipMemcpyAsync_htod(dst, src, count, stream):
     """
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
-                                    hipMemcpyHostToDevice, stream)
+                                    int(hipMemcpyKind.hipMemcpyHostToDevice), stream)
     return (hipError(status),)
 
 
@@ -594,7 +596,7 @@ def hipMemcpyAsync_dtoh(dst, src, count, stream):
 
     status = _libhip.hipMemcpyAsync(dst, src,
                                     ctypes.c_size_t(count),
-                                    hipMemcpyDeviceToHost, stream)
+                                    int(hipMemcpyKind.hipMemcpyDeviceToHost), stream)
     return (hipError(status),)
 
 
@@ -964,10 +966,11 @@ def hipGetDeviceProperties(deviceId: int):
 
 
 # Memory types:
-hipMemoryTypeHost = 1
-hipMemoryTypeDevice = 2
-hipMemoryTypeArray = 3
-hipMemoryTypeUnified = 4  # Not used currently
+class hipMemoryType(IntEnum):
+    hipMemoryTypeHost = 1
+    hipMemoryTypeDevice = 2
+    hipMemoryTypeArray = 3
+    hipMemoryTypeUnified = 4  # Not used currently
 
 
 class hipPointerAttributes(ctypes.Structure):
@@ -1205,8 +1208,11 @@ def hipGetDeviceCount():
     return (hipError(status), c_count.value)
 
 
-hipDeviceAttributeComputeCapabilityMajor = 23
-hipDeviceAttributeComputeCapabilityMinor = 61
+class hipDeviceAttr(IntEnum):
+    hipDeviceAttributeComputeCapabilityMajor = 23
+    hipDeviceAttributeComputeCapabilityMinor = 61
+
+
 _libhip.hipDeviceGetAttribute.restype = int
 _libhip.hipDeviceGetAttribute.argtypes = [
     ctypes.POINTER(ctypes.c_int), ctypes.c_uint, ctypes.c_int]
@@ -1229,7 +1235,10 @@ def hipDeviceGetAttribute(attribute, device):
     return (hipError(status), c_attr.value)
 
 
-hipLimitMallocHeapSize = 2
+class hipLimit(IntEnum):
+    hipLimitMallocHeapSize = 2
+
+
 _libhip.hipDeviceSetLimit.restype = int
 _libhip.hipDeviceSetLimit.argtypes = [
     ctypes.c_uint, ctypes.c_size_t]

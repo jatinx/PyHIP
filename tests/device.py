@@ -24,10 +24,10 @@ def test_hipDeviceGetAttribute():
     assert device_count != 0
     for i in range(0, device_count):
         (hres, major) = hip.hipDeviceGetAttribute(
-            hip.hipDeviceAttributeComputeCapabilityMajor, i)
+            hip.hipDeviceAttr.hipDeviceAttributeComputeCapabilityMajor, i)
         ASSERT_DRV(hres)
         (hres, minor) = hip.hipDeviceGetAttribute(
-            hip.hipDeviceAttributeComputeCapabilityMinor, i)
+            hip.hipDeviceAttr.hipDeviceAttributeComputeCapabilityMinor, i)
         ASSERT_DRV(hres)
         assert major != 0
         assert minor != 0
@@ -38,7 +38,7 @@ def test_hipDeviceSetLimit():
     ASSERT_DRV(hres)
     assert device_count != 0
     for _ in range(0, device_count):
-        (hres, ) = hip.hipDeviceSetLimit(hip.hipLimitMallocHeapSize, 0)
+        (hres, ) = hip.hipDeviceSetLimit(hip.hipLimit.hipLimitMallocHeapSize, 0)
         ASSERT_DRV(hres)
 
 
