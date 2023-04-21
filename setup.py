@@ -11,7 +11,7 @@ with open("pyhip/__init__.py") as fp:
     version = match.group(1)
 
 setup(
-    name='pyhip',
+    name='pyhip-wrapper',
     version=version,
     author='Jatin Chaudhary',
     description='A Python Interface of the Heterogeneous Interface for Portability (HIP)',
