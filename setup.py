@@ -11,10 +11,10 @@ with open("pyhip/__init__.py") as fp:
     version = match.group(1)
 
 setup(
-    name='pyhip-wrapper',
+    name='pyhip-interface',
     version=version,
     author='Jatin Chaudhary',
-    description='A Python Interface of the Heterogeneous Interface for Portability (HIP)',
+    description='Python Interface to HIP and hiprtc Library',
     packages=['pyhip'],
     py_modules=['hip', 'hiprtc'],
     keywords='HIP GPU parallel computing scientific computing Python wrapper',
