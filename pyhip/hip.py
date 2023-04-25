@@ -107,9 +107,6 @@ class hipError(Exception):
     """hip error"""
     pass
 
-class hipSuccess(hipError):
-    __doc__ = _libhip.hipGetErrorString(0)
-    pass
 
 class hipErrorInvalidValue(hipError):
     __doc__ = _libhip.hipGetErrorString(1)
@@ -407,7 +404,6 @@ class hipErrorRuntimeOther(hipError):
 
 
 hipExceptions = {
-    0: hipSuccess,
     1: hipErrorInvalidValue,
     2: hipErrorOutOfMemory,
     3: hipErrorNotInitialized,
@@ -744,9 +740,9 @@ def hipEventQuery(event):
         Event to Query.
     """
     status = _libhip.hipEventQuery(event)
-    if status == hipSuccess:
+    if status == 0:       # hipSuccess
         return True
-    elif status == hipErrorNotReady:
+    elif status == 600:   # hipErrorNotReady
         return False
     else:
         hipCheckStatus(status)
