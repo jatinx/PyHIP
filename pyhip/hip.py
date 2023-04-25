@@ -731,13 +731,19 @@ def hipEventQuery(event):
     """
     Query event status.
 
-    If all work associated with the event has completed, or  hipEventRecord() was not called on the event,
-    this function returns True. If the work has not completed, this function returns False. 
+    If all work associated with the event has completed, or hipEventRecord() 
+    was not called on the event, this function returns True. If the work has 
+    not completed, this function returns False. 
 
     Parameters
     ----------
     event : ctypes pointer
         Event to Query.
+    
+    Returns
+    -------
+    ptr : bool
+        Outcome of Query.
     """
     status = _libhip.hipEventQuery(event)
     if status == 0:       # hipSuccess
@@ -1454,11 +1460,11 @@ _libhip.hipModuleGetGlobal.argtypes = [ctypes.POINTER(ctypes.c_void_p), # symbol
 
 def hipModuleGetGlobal(module, name):
     """
-    Retrieve the pointer to a global variable defined in a HIP module.
+    Retrieve a device memory pointer defined in a HIP module.
 
-    This function retrieves the pointer to a global variable with the specified name 
+    This function retrieves the device memory pointer with the specified name 
     defined in the HIP module specified by `module`. If successful, the function returns 
-    a tuple containing a ctypes pointer to the global variable and its size.
+    a tuple containing a ctypes pointer to the device memory and its size.
 
     Parameters
     ----------
@@ -1466,6 +1472,11 @@ def hipModuleGetGlobal(module, name):
         Handle to the module to retrieve the global variable from.
     name : str
         Name of the global variable to retrieve.
+
+    Returns
+    -------
+    Tuple: (ctypes pointer, ctypes size_t)
+        device memory pointer and its size.
     """
 
     symbol_string = ctypes.c_char_p(name.encode('utf-8'))
