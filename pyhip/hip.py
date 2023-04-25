@@ -107,6 +107,9 @@ class hipError(Exception):
     """hip error"""
     pass
 
+class hipSuccess(hipError):
+    __doc__ = _libhip.hipGetErrorString(0)
+    pass
 
 class hipErrorInvalidValue(hipError):
     __doc__ = _libhip.hipGetErrorString(1)
@@ -404,6 +407,7 @@ class hipErrorRuntimeOther(hipError):
 
 
 hipExceptions = {
+    0: hipSuccess,
     1: hipErrorInvalidValue,
     2: hipErrorOutOfMemory,
     3: hipErrorNotInitialized,
@@ -723,6 +727,29 @@ def hipEventElapsedTime(start, stop):
     status = _libhip.hipEventElapsedTime(ctypes.byref(t), start, stop)
     hipCheckStatus(status)
     return t.value
+
+_libhip.hipEventQuery.restype = ctypes.c_int
+_libhip.hipEventQuery.argtypes = [ctypes.c_void_p]
+
+def hipEventQuery(event):
+    """
+    Query event status.
+
+    If all work associated with the event has completed, or  hipEventRecord() was not called on the event,
+    this function returns True. If the work has not completed, this function returns False. 
+
+    Parameters
+    ----------
+    event : ctypes pointer
+        Event to Query.
+    """
+    status = _libhip.hipEventQuery(event)
+    if status == hipSuccess:
+        return True
+    elif status == hipErrorNotReady:
+        return False
+    else:
+        hipCheckStatus(status)
 
 
 # Memory allocation functions (adapted from pystream):
