@@ -847,6 +847,29 @@ def hipMallocPitch(pitch, rows, cols, elesize):
     hipCheckStatus(status)
     return ptr, pitch
 
+_libhip.hipMemset.restype = ctypes.c_int
+_libhip.hipMemset.argtypes = [ctypes.c_void_p,  # ptr to allocation
+                              ctypes.c_int,     # value
+                              ctypes.c_size_t]  # bytes to set
+
+def hipMemset(dst, value, sizeBytes):
+    """
+    Fills the first sizeBytes bytes of the memory area pointed to by dst with 
+    the constant byte value value.
+
+    Parameters
+    ----------
+    dst : ctypes pointer
+        Pointer to the memory to set.
+    value : a single 8-bit int
+        The value to set.
+    sizeBytes : int
+        The number of bytes to set.
+    """
+    ctypes_value = ctypes.c_int(value)
+    ctypes_size = ctypes.c_size_t(sizeBytes)
+    status = _libhip.hipMemset(dst, ctypes_value, ctypes_size)
+    hipCheckStatus(status)
 
 # Memory copy modes:
 hipMemcpyHostToHost = 0
