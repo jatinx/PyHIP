@@ -1427,6 +1427,39 @@ def hipModuleGetFunction(module, func_name):
     hipCheckStatus(status)
     return kernel
 
+_libhip.hipModuleGetGlobal.restype = ctypes.c_int
+_libhip.hipModuleGetGlobal.argtypes = [ctypes.POINTER(ctypes.c_void_p), # symbol ptr
+                                       ctypes.POINTER(ctypes.c_size_t), # size ptr
+                                       ctypes.c_void_p,                 # module
+                                       ctypes.c_char_p]                 # symbol string
+
+def hipModuleGetGlobal(module, name):
+    """
+    Retrieve the pointer to a global variable defined in a HIP module.
+
+    This function retrieves the pointer to a global variable with the specified name 
+    defined in the HIP module specified by `module`. If successful, the function returns 
+    a tuple containing a ctypes pointer to the global variable and its size.
+
+    Parameters
+    ----------
+    module : ctypes pointer
+        Handle to the module to retrieve the global variable from.
+    name : str
+        Name of the global variable to retrieve.
+    """
+
+    symbol_string = ctypes.c_char_p(name.encode('utf-8'))
+    symbol = ctypes.c_void_p()
+    symbol_ptr = ctypes.POINTER(ctypes.c_void_p)(symbol)
+
+    size_kernel = ctypes.c_size_t(0)
+    size_kernel_ptr = ctypes.POINTER(ctypes.c_size_t)(size_kernel)
+
+    status = _libhip.hipModuleGetGlobal(symbol_ptr, size_kernel_ptr, module, symbol_string)
+    hipCheckStatus(status)
+
+    return (symbol_ptr.contents, size_kernel_ptr.contents)
 
 _libhip.hipModuleUnload.restype = int
 _libhip.hipModuleUnload.argtypes = [ctypes.c_void_p]
