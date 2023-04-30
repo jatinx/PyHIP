@@ -86,8 +86,8 @@ If you are an opensource developer and want to contribute to this project, I can
 
 - Unable to load hip or hiprtc library - OSError: libamdhip64.so: cannot open shared object file: No such file or directory.
 
-- Make sure that LD_LIBRARY_PATH has hip path on it (/opt/rocm/lib or a custom installation path)
+  - Make sure that LD_LIBRARY_PATH has hip path on it (/opt/rocm/lib or a custom installation path)
 
 - Getting error and need to debug
 
-- Set AMD_LOG_LEVEL=7 for maximum verbosity of HIP APIs (this only works on amd platform).
+  - Set AMD_LOG_LEVEL=7 for maximum verbosity of HIP APIs (this only works on amd platform).

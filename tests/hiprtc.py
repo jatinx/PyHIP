@@ -26,7 +26,7 @@ def test_hiprtcCompileProgram():
     global_var, global_var_size = hip.hipModuleGetGlobal(module, 'myGlobalVar')
     assert global_var != None
     assert global_var_size == 4
-    set_global_var = res = (ctypes.c_int * 1)()
+    set_global_var = (ctypes.c_int * 1)()
     set_global_var[0] = 10
     hip.hipMemcpy_htod(global_var, ctypes.byref(set_global_var), 4)
     ptr = hip.hipMalloc(4)
@@ -37,7 +37,8 @@ def test_hiprtcCompileProgram():
     struct = PackageStruct(ptr)
     hip.hipModuleLaunchKernel(kernel, 1, 1, 1, 1, 1, 1, 0, 0, struct)
     res = (ctypes.c_int * 1)()
+    res[0] = 0
     hip.hipMemcpy_dtoh(ctypes.byref(res), ptr, 4)
     assert res[0] == 10
-
+    hip.hipFree(ptr)
     hiprtc.hiprtcDestroyProgram(prog)
