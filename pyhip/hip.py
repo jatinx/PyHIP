@@ -724,6 +724,35 @@ def hipEventElapsedTime(start, stop):
     hipCheckStatus(status)
     return t.value
 
+_libhip.hipEventQuery.restype = ctypes.c_int
+_libhip.hipEventQuery.argtypes = [ctypes.c_void_p]
+
+def hipEventQuery(event):
+    """
+    Query event status.
+
+    If all work associated with the event has completed, or hipEventRecord() 
+    was not called on the event, this function returns True. If the work has 
+    not completed, this function returns False. 
+
+    Parameters
+    ----------
+    event : ctypes pointer
+        Event to Query.
+    
+    Returns
+    -------
+    ptr : bool
+        Outcome of Query, True if event is complete, False otherwise.
+    """
+    status = _libhip.hipEventQuery(event)
+    if status == 0:       # hipSuccess
+        return True
+    elif status == 600:   # hipErrorNotReady
+        return False
+    else:
+        hipCheckStatus(status)
+
 
 # Memory allocation functions (adapted from pystream):
 _libhip.hipMalloc.restype = int
@@ -820,6 +849,29 @@ def hipMallocPitch(pitch, rows, cols, elesize):
     hipCheckStatus(status)
     return ptr, pitch
 
+_libhip.hipMemset.restype = ctypes.c_int
+_libhip.hipMemset.argtypes = [ctypes.c_void_p,  # ptr to allocation
+                              ctypes.c_int,     # value
+                              ctypes.c_size_t]  # bytes to set
+
+def hipMemset(dst, value, sizeBytes):
+    """
+    Fills the first sizeBytes bytes of the memory area pointed to by dst with 
+    the constant byte value value.
+
+    Parameters
+    ----------
+    dst : ctypes pointer
+        Pointer to the memory to set.
+    value : a single 8-bit int
+        The value to set.
+    sizeBytes : int
+        The number of bytes to set.
+    """
+    ctypes_value = ctypes.c_int(value)
+    ctypes_size = ctypes.c_size_t(sizeBytes)
+    status = _libhip.hipMemset(dst, ctypes_value, ctypes_size)
+    hipCheckStatus(status)
 
 # Memory copy modes:
 hipMemcpyHostToHost = 0
@@ -1400,6 +1452,44 @@ def hipModuleGetFunction(module, func_name):
     hipCheckStatus(status)
     return kernel
 
+_libhip.hipModuleGetGlobal.restype = ctypes.c_int
+_libhip.hipModuleGetGlobal.argtypes = [ctypes.POINTER(ctypes.c_void_p), # symbol ptr
+                                       ctypes.POINTER(ctypes.c_size_t), # size ptr
+                                       ctypes.c_void_p,                 # module
+                                       ctypes.c_char_p]                 # symbol string
+
+def hipModuleGetGlobal(module, name):
+    """
+    Retrieve a device memory pointer defined in a HIP module.
+
+    This function retrieves the device memory pointer with the specified name 
+    defined in the HIP module specified by `module`. If successful, the function returns 
+    a tuple containing a ctypes pointer to the device memory and its size.
+
+    Parameters
+    ----------
+    module : ctypes pointer
+        Handle to the module to retrieve the global variable from.
+    name : str
+        Name of the global variable to retrieve.
+
+    Returns
+    -------
+    Tuple: (ctypes pointer, ctypes size_t)
+        device memory pointer and its size.
+    """
+
+    symbol_string = ctypes.c_char_p(name.encode('utf-8'))
+    symbol = ctypes.c_void_p()
+    symbol_ptr = ctypes.POINTER(ctypes.c_void_p)(symbol)
+
+    size_kernel = ctypes.c_size_t(0)
+    size_kernel_ptr = ctypes.POINTER(ctypes.c_size_t)(size_kernel)
+
+    status = _libhip.hipModuleGetGlobal(symbol_ptr, size_kernel_ptr, module, symbol_string)
+    hipCheckStatus(status)
+
+    return (symbol_ptr.contents, size_kernel_ptr.contents.value)
 
 _libhip.hipModuleUnload.restype = int
 _libhip.hipModuleUnload.argtypes = [ctypes.c_void_p]
