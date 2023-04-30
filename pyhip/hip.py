@@ -743,7 +743,7 @@ def hipEventQuery(event):
     Returns
     -------
     ptr : bool
-        Outcome of Query.
+        Outcome of Query, True if event is complete, False otherwise.
     """
     status = _libhip.hipEventQuery(event)
     if status == 0:       # hipSuccess
@@ -1489,7 +1489,7 @@ def hipModuleGetGlobal(module, name):
     status = _libhip.hipModuleGetGlobal(symbol_ptr, size_kernel_ptr, module, symbol_string)
     hipCheckStatus(status)
 
-    return (symbol_ptr.contents, size_kernel_ptr.contents)
+    return (symbol_ptr.contents, size_kernel_ptr.contents.value)
 
 _libhip.hipModuleUnload.restype = int
 _libhip.hipModuleUnload.argtypes = [ctypes.c_void_p]

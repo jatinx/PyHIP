@@ -4,7 +4,8 @@ import ctypes
 
 def test_hiprtcCompileProgram():
     source = """
-    extern "C" __global__ void kernel(int *a) { *a = 10; }
+    __device__ int myGlobalVar;
+    extern "C" __global__ void kernel(int *a) { *a = myGlobalVar; }
     """
     prog = hiprtc.hiprtcCreateProgram(source, 'kernel', [], [])
     assert prog != None
@@ -22,6 +23,12 @@ def test_hiprtcCompileProgram():
     assert module != None
     kernel = hip.hipModuleGetFunction(module, 'kernel')
     assert kernel != None
+    global_var, global_var_size = hip.hipModuleGetGlobal(module, 'myGlobalVar')
+    assert global_var != None
+    assert global_var_size == 4
+    set_global_var = res = (ctypes.c_int * 1)()
+    set_global_var[0] = 10
+    hip.hipMemcpy_htod(global_var, ctypes.byref(set_global_var), 4)
     ptr = hip.hipMalloc(4)
     assert ptr != None
 
