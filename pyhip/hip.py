@@ -1659,25 +1659,6 @@ def hipDeviceGetAttribute(attribute, device):
 
 
 hipLimitMallocHeapSize = 2
-_libhip.hipDeviceSetLimit.restype = int
-_libhip.hipDeviceSetLimit.argtypes = [
-    ctypes.c_uint, ctypes.c_size_t]
-
-
-def hipDeviceSetLimit(attribute, value):
-    """
-    Set device limits
-
-    Parameters
-    ----------
-    attribute : int
-    device id : int
-    """
-    c_attribute = ctypes.c_uint(attribute)
-    c_value = ctypes.c_size_t(value)
-    status = _libhip.hipDeviceSetLimit(c_attribute, c_value)
-    hipCheckStatus(status)
-
 
 _libhip.hipDriverGetVersion.restype = int
 _libhip.hipDriverGetVersion.argtypes = [
@@ -1709,3 +1690,27 @@ def hipRuntimeGetVersion():
         ctypes.byref(c_version))
     hipCheckStatus(status)
     return c_version.value
+
+if hipDriverGetVersion() < 50200000:
+    _libhip.hipDeviceSetLimit.restype = int
+    _libhip.hipDeviceSetLimit.argtypes = [
+        ctypes.c_uint, ctypes.c_size_t]
+
+
+def hipDeviceSetLimit(attribute, value):
+    """
+    Set device limits
+
+    Parameters
+    ----------
+    attribute : int
+    device id : int
+    """
+    hip_driver_version = hipDriverGetVersion()
+    if hip_driver_version < 50200000:
+        c_attribute = ctypes.c_uint(attribute)
+        c_value = ctypes.c_size_t(value)
+        status = _libhip.hipDeviceSetLimit(c_attribute, c_value)
+        hipCheckStatus(status)
+    else:
+        raise RuntimeError(f'hipDeviceSetLimit is not supported in version {hip_driver_version}')
