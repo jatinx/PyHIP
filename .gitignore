@@ -1,2 +1,4 @@
 .vscode
 *pycache*
+venv
+*.egg-info

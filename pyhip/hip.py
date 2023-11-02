@@ -22,9 +22,15 @@ if 'linux' in sys.platform:
         except:
             raise RuntimeError(
                 'cant find libamdhip64.so or libnvhip64.so. make sure LD_LIBRARY_PATH is set')
+elif 'win' in sys.platform:
+    try:
+        _libhip_libname = 'amdhip64'
+        _libhip = ctypes.cdll.LoadLibrary(_libhip_libname)
+        _hip_platform_name = 'amd'
+    except:
+        raise RuntimeError("error loading hip on windows")
 else:
-    # Currently we do not support windows, mainly because I do not have a windows build of hip
-    raise RuntimeError('Only linux is supported')
+    raise RuntimeError('Only linux/windows is supported')
 
 if _libhip is None:
     raise OSError('hip (libamdhip64.so or libnvhip64.so) library not found')
