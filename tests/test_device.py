@@ -13,10 +13,8 @@ class TestDevice(unittest.TestCase):
         for i in range(0, device_count):
             major = hip.hipDeviceGetAttribute(
                 hip.hipDeviceAttributeComputeCapabilityMajor, i)
-            minor = hip.hipDeviceGetAttribute(
-                hip.hipDeviceAttributeComputeCapabilityMinor, i)
             self.assertNotEqual(major, 0)
-            self.assertNotEqual(minor, 0)
+            # Do not check minor since minor can be 0, for example gfx1100
 
     @unittest.skipIf('win' in sys.platform, "failing on windows")
     def test_hipDeviceSetLimit(self):
