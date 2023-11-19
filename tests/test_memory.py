@@ -3,12 +3,12 @@ import ctypes
 from itertools import repeat
 import unittest
 
+
 class TestMemory(unittest.TestCase):
     def test_hipMalloc(self):
         ptr = hip.hipMalloc(4)
         assert ptr != None
         hip.hipFree(ptr)
-
 
     def create_array(self, count):
         res = (ctypes.c_int * count)()
@@ -16,13 +16,11 @@ class TestMemory(unittest.TestCase):
             res[i] = i + 1
         return res
 
-
     def create_res_array(self, count):
         res = (ctypes.c_int * count)()
         for i in range(count):
             res[i] = 0
         return res
-
 
     def test_hipMemcpy(self):
         count = 10
@@ -35,7 +33,6 @@ class TestMemory(unittest.TestCase):
         hip.hipMemcpy_dtoh(ctypes.byref(res1), ptr, size)
         for i in repeat(0, count):
             self.assertEqual(res[i], res1[i])
-
 
     def test_hipMemcpyAsync(self):
         stream = hip.hipStreamCreate()
@@ -61,6 +58,7 @@ class TestMemory(unittest.TestCase):
         output = (ctypes.c_int8 * size)()
         hip.hipMemcpy_dtoh(output, x_d, size)
         assert all(output[i] == 4 for i in range(len(output)))
+
 
 if __name__ == "__main__":
     unittest.main()

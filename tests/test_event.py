@@ -3,15 +3,15 @@ import ctypes
 from itertools import repeat
 import unittest
 
+
 class TestEvent(unittest.TestCase):
     def create_array(self, count):
         res = (ctypes.c_int * count)()
         j = 1
         for i in repeat(0, count):
-            res[j-1] = j
+            res[j - 1] = j
             j = j + 1
         return res
-
 
     def create_res_array(self, count):
         res = (ctypes.c_int * count)()
@@ -19,7 +19,6 @@ class TestEvent(unittest.TestCase):
         for i in repeat(0, count):
             res[i] = 0
         return res
-
 
     def test_hipEvents(self):
         stream = hip.hipStreamCreate()
@@ -36,7 +35,7 @@ class TestEvent(unittest.TestCase):
         hip.hipMemcpyAsync_htod(ptr, in_val, size, stream)
         hip.hipMemcpyAsync_dtoh(res, ptr, size, stream)
         hip.hipEventRecord(end, stream)
-        
+
         hip.hipEventSynchronize(end)
         self.assertTrue(hip.hipEventQuery(end))
         time = hip.hipEventElapsedTime(start, end)
@@ -47,6 +46,7 @@ class TestEvent(unittest.TestCase):
         hip.hipStreamDestroy(stream)
         hip.hipEventDestroy(start)
         hip.hipEventDestroy(end)
+
 
 if __name__ == "__main__":
     unittest.main()

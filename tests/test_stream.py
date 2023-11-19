@@ -2,6 +2,8 @@ from pyhip import hip
 import ctypes
 from itertools import repeat
 import unittest
+
+
 class TestStream(unittest.TestCase):
     def create_array(self, count):
         res = (ctypes.c_int * count)()
@@ -9,13 +11,11 @@ class TestStream(unittest.TestCase):
             res[i] = i + 1
         return res
 
-
     def create_res_array(self, count):
         res = (ctypes.c_int * count)()
         for i in range(count):
             res[i] = 0
         return res
-
 
     def test_hipStreamCreation(self):
         stream = hip.hipStreamCreate()
@@ -33,6 +33,7 @@ class TestStream(unittest.TestCase):
             self.assertEqual(res[i], in_val[i])
         hip.hipFree(ptr)
         hip.hipStreamDestroy(stream)
+
 
 if __name__ == "__main__":
     unittest.main()

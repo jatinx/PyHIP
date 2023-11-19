@@ -14,7 +14,7 @@ def create_array():
     j = 1
     for i in repeat(0, size):
         cpu.append(j)
-        gpu[j-1] = j
+        gpu[j - 1] = j
         j = j + 1
     return cpu, gpu
 
@@ -40,29 +40,30 @@ def gpu_axpy(res):
       }
     }
     """
-    prog = hiprtc.hiprtcCreateProgram(source, 'axpy', [], [])
+    prog = hiprtc.hiprtcCreateProgram(source, "axpy", [], [])
     device_properties = hip.hipGetDeviceProperties(0)
     print(f"Compiling kernel for {device_properties.gcnArchName}")
     hiprtc.hiprtcCompileProgram(
-        prog, [f'--offload-arch={device_properties.gcnArchName}'])
+        prog, [f"--offload-arch={device_properties.gcnArchName}"]
+    )
     code = hiprtc.hiprtcGetCode(prog)
     module = hip.hipModuleLoadData(code)
-    kernel = hip.hipModuleGetFunction(module, 'axpy')
+    kernel = hip.hipModuleGetFunction(module, "axpy")
     ptr = hip.hipMalloc(4 * size)
 
     class PackageStruct(ctypes.Structure):
-        _fields_ = [("a", ctypes.c_void_p),
-                    ("x", ctypes.c_int),
-                    ("y", ctypes.c_int),
-                    ("size", ctypes.c_size_t)]
+        _fields_ = [
+            ("a", ctypes.c_void_p),
+            ("x", ctypes.c_int),
+            ("y", ctypes.c_int),
+            ("size", ctypes.c_size_t),
+        ]
 
-    hip.hipMemcpy_htod(ptr, ctypes.byref(
-        res), ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_htod(ptr, ctypes.byref(res), ctypes.sizeof(ctypes.c_int) * size)
     struct = PackageStruct(ptr, 2, 3, size)
-    block = int(size/1024) + 1
+    block = int(size / 1024) + 1
     hip.hipModuleLaunchKernel(kernel, block, 1, 1, 1024, 1, 1, 0, 0, struct)
-    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr,
-                       ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr, ctypes.sizeof(ctypes.c_int) * size)
     hip.hipFree(ptr)
     return res
 
