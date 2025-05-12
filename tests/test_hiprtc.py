@@ -26,7 +26,8 @@ class TestHiprtc(unittest.TestCase):
         self.assertIsNotNone(module)
         kernel = hip.hipModuleGetFunction(module, "kernel")
         self.assertIsNotNone(kernel)
-        global_var, global_var_size = hip.hipModuleGetGlobal(module, "myGlobalVar")
+        global_var, global_var_size = hip.hipModuleGetGlobal(
+            module, "myGlobalVar")
         self.assertIsNotNone(global_var)
         self.assertEqual(global_var_size, 4)
         set_global_var = (ctypes.c_int * 1)()

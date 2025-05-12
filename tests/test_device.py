@@ -18,7 +18,7 @@ class TestDevice(unittest.TestCase):
             self.assertNotEqual(major, 0)
             # Do not check minor since minor can be 0, for example gfx1100
 
-    @unittest.skipIf("win" in sys.platform, "failing on windows")
+    @unittest.skipIf(hip.hipDriverGetVersion() >= 50200000, "Mostly unsupported API on AMDGPUs")
     def test_hipDeviceSetLimit(self):
         device_count = hip.hipGetDeviceCount()
         self.assertNotEqual(device_count, 0)

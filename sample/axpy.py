@@ -59,11 +59,13 @@ def gpu_axpy(res):
             ("size", ctypes.c_size_t),
         ]
 
-    hip.hipMemcpy_htod(ptr, ctypes.byref(res), ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_htod(ptr, ctypes.byref(
+        res), ctypes.sizeof(ctypes.c_int) * size)
     struct = PackageStruct(ptr, 2, 3, size)
     block = int(size / 1024) + 1
     hip.hipModuleLaunchKernel(kernel, block, 1, 1, 1024, 1, 1, 0, 0, struct)
-    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr, ctypes.sizeof(ctypes.c_int) * size)
+    hip.hipMemcpy_dtoh(ctypes.byref(res), ptr,
+                       ctypes.sizeof(ctypes.c_int) * size)
     hip.hipFree(ptr)
     return res
 

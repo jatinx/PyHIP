@@ -43,7 +43,8 @@ class TestMemory(unittest.TestCase):
         self.assertIsNotNone(ptr)
         in_val = self.create_array(count)
         res = self.create_res_array(count)
-        hip.hipMemcpyAsync(ptr, in_val, size, hip.hipMemcpyHostToDevice, stream)
+        hip.hipMemcpyAsync(ptr, in_val, size,
+                           hip.hipMemcpyHostToDevice, stream)
         hip.hipMemcpyAsync(res, ptr, size, hip.hipMemcpyDeviceToHost, stream)
         hip.hipStreamSynchronize(stream)
         for i in repeat(0, count):

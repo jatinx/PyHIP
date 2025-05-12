@@ -1,10 +1,12 @@
 import re
 from setuptools import setup
 
+
 def readme():
     with open("README.md") as f:
         return f.read()
-    
+
+
 # Extract the version number from the package's __init__.py file
 with open("pyhip/__init__.py") as fp:
     match = re.search(r"__version__\s*=\s*['\"]([^'\"]+)['\"]", fp.read())

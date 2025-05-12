@@ -638,7 +638,8 @@ def hipMemcpy_htod(dst, src, count):
 
     """
 
-    status = _libhip.hipMemcpy(dst, src, ctypes.c_size_t(count), hipMemcpyHostToDevice)
+    status = _libhip.hipMemcpy(
+        dst, src, ctypes.c_size_t(count), hipMemcpyHostToDevice)
     hipCheckStatus(status)
 
 
@@ -659,7 +660,8 @@ def hipMemcpy_dtoh(dst, src, count):
 
     """
 
-    status = _libhip.hipMemcpy(dst, src, ctypes.c_size_t(count), hipMemcpyDeviceToHost)
+    status = _libhip.hipMemcpy(
+        dst, src, ctypes.c_size_t(count), hipMemcpyDeviceToHost)
     hipCheckStatus(status)
 
 
@@ -736,7 +738,8 @@ def hipMemcpyAsync(dst, src, count, direction, stream):
         Stream on which command is to be enqueued
 
     """
-    status = _libhip.hipMemcpyAsync(dst, src, ctypes.c_size_t(count), direction, stream)
+    status = _libhip.hipMemcpyAsync(
+        dst, src, ctypes.c_size_t(count), direction, stream)
     hipCheckStatus(status)
 
 
@@ -988,7 +991,8 @@ class hipDeviceProperties(ctypes.Structure):
 
 
 _libhip.hipGetDeviceProperties.restype = int
-_libhip.hipGetDeviceProperties.argtypes = [POINTER(hipDeviceProperties), ctypes.c_int]
+_libhip.hipGetDeviceProperties.argtypes = [
+    POINTER(hipDeviceProperties), ctypes.c_int]
 
 
 def hipGetDeviceProperties(deviceId: int):
@@ -1005,7 +1009,8 @@ def hipGetDeviceProperties(deviceId: int):
        Information for the specified device
     """
     device_properties = hipDeviceProperties()
-    status = _libhip.hipGetDeviceProperties(ctypes.pointer(device_properties), deviceId)
+    status = _libhip.hipGetDeviceProperties(
+        ctypes.pointer(device_properties), deviceId)
     hipCheckStatus(status)
     return device_properties
 
@@ -1110,7 +1115,8 @@ def hipModuleGetFunction(module, func_name):
     """
     e_func_name = func_name.encode("utf-8")
     kernel = ctypes.c_void_p()
-    status = _libhip.hipModuleGetFunction(ctypes.byref(kernel), module, e_func_name)
+    status = _libhip.hipModuleGetFunction(
+        ctypes.byref(kernel), module, e_func_name)
     hipCheckStatus(status)
     return kernel
 
@@ -1330,7 +1336,8 @@ def hipDeviceGetAttribute(attribute, device):
     c_attr = ctypes.c_int(0)
     c_attribute = ctypes.c_uint(attribute)
     c_device = ctypes.c_int(device)
-    status = _libhip.hipDeviceGetAttribute(ctypes.byref(c_attr), c_attribute, c_device)
+    status = _libhip.hipDeviceGetAttribute(
+        ctypes.byref(c_attr), c_attribute, c_device)
     hipCheckStatus(status)
     return c_attr.value
 

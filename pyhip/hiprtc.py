@@ -1,7 +1,9 @@
 """
 Python interface to hiprtc
 """
-import os, sys, ctypes
+import os
+import sys
+import ctypes
 
 _libhiprtc_libname = "libhiprtc.so"
 _libhiprtc_fallback_libname = "libamdhip64.so"  # Fall back library
